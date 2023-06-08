@@ -1,0 +1,31 @@
+﻿<Page x:Class="go4work.logowanie"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:go4work"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="logowanie">
+
+    <Grid ShowGridLines="True">
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="Black" Offset="1"/>
+                <GradientStop Color="#FFB58282"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <TextBox x:Name="str_pesel" HorizontalAlignment="Left" Margin="327,126,0,0" TextWrapping="Wrap" Text="pesel" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.487,1.922">
+            <TextBox.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="180.147"/>
+                    <TranslateTransform X="3.186" Y="-51.074"/>
+                </TransformGroup>
+            </TextBox.RenderTransform>
+        </TextBox>
+        <TextBox x:Name="str_haslo" HorizontalAlignment="Left" Margin="330,163,0,0" TextWrapping="Wrap" Text="hasło" VerticalAlignment="Top" Width="120"/>
+        <Button Content="zaloguj" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Button_Click" Margin="368,207,0,0"/>
+    </Grid>
+</Page>

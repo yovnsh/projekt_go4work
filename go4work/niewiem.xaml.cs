@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,16 +16,13 @@ using System.Windows.Shapes;
 namespace go4work
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Logika interakcji dla klasy niewiem.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class niewiem : UserControl
     {
-        
-        public MainWindow()
+        public niewiem()
         {
             InitializeComponent();
-            yanosik.Content = new logowanie();
         }
-
     }
 }
