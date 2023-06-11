@@ -23,8 +23,7 @@ namespace go4work
         public string Hotel { get; set; } = "-- hotel --";
         public string Data { get; set; } = "-- data --";
         public string Godziny { get; set; } = "-- godziny --";
-        public string Dlugosc { get; set; } = "-- długość zmiany --"; // nie pamiętam co tam było w ostatnim
-
+        public string Wynagrodzenie { get; set; } = "-- wynagrodzenie --"; 
         public niewiem()
         {
             InitializeComponent();

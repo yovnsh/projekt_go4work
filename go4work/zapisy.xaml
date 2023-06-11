@@ -15,9 +15,12 @@
                 <GradientStop Color="#FFF1BCBC" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="547,111,0,0" VerticalAlignment="Top"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="506,111,0,0" VerticalAlignment="Top"/>
+        <Button Content="Odśwież" HorizontalAlignment="Left" Margin="634,111,0,0" VerticalAlignment="Top" Click="Refresh"></Button>
         <DatePicker HorizontalAlignment="Left" Margin="309,109,0,0" VerticalAlignment="Top"/>
         <ComboBox HorizontalAlignment="Left" Margin="109,113,0,0" VerticalAlignment="Top" Width="120"/>
-
+        <Grid x:Name="Offers" Margin="0,168,0,0">
+            <TextBlock Text="..." TextAlignment="Center"></TextBlock>
+        </Grid>
     </Grid>
 </Page>

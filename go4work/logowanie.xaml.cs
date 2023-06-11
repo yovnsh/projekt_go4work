@@ -21,6 +21,7 @@ namespace go4work
     /// </summary>
     public partial class logowanie : Page
     {
+
         public logowanie()
         {
             InitializeComponent();
@@ -28,25 +29,24 @@ namespace go4work
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            SqlConnection connection = new SqlConnection("Data Source=GABI;Initial Catalog=go4work;Trusted_Connection=True;");
-            connection.Open();
+            //TODO: uprościć funkcję
 
-            string command = $"select * from users where pesel='{str_pesel.Text}';";
-            //string command = "select * from users";
-            SqlCommand sql_command = new SqlCommand(command, connection);
+            string command = $"select password from users where pesel='{str_pesel.Text}';";
+            SqlCommand sql_command = new SqlCommand(command, App.connection);
             SqlDataReader reader = sql_command.ExecuteReader();
-            //reader.Read();
 
             if (reader.Read() && str_haslo.Text == reader["password"].ToString())
             {
                 MessageBox.Show("tez kocham kotki");
-                this.NavigationService.Navigate(new Uri("zapisy.xaml",UriKind.Relative));
+                reader.Close();
+
+                this.NavigationService.Navigate(new Uri("zapisy.xaml", UriKind.Relative));
             }
             else
             {
                 MessageBox.Show("wole pieski");
+                reader.Close();
             }
-            connection.Close();
         }
     }
 }
