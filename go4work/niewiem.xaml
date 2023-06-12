@@ -22,7 +22,7 @@
         <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="{Binding Hotel}" VerticalAlignment="Center" Grid.Column="0"/>
         <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="{Binding Data}" VerticalAlignment="Center" Grid.Column="1"/>
         <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="{Binding Godziny}" VerticalAlignment="Center" Grid.Column="2"/>
-        <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="{Binding Dlugosc}" VerticalAlignment="Center" Grid.Column="3"/>
+        <TextBlock HorizontalAlignment="Center" TextWrapping="Wrap" Text="{Binding Wynagrodzenie}" VerticalAlignment="Center" Grid.Column="3"/>
         <Button Content="Zapisz się" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="4"/>
     </Grid>
 </UserControl>
