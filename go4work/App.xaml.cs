@@ -15,6 +15,7 @@ namespace go4work
     public partial class App : Application
     {
         public static SqlConnection connection;
+        public static string logged_user_id = "-1";
 
         protected override void OnStartup(StartupEventArgs e)
         {

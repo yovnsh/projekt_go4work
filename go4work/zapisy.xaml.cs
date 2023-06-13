@@ -67,6 +67,11 @@ namespace go4work
             UpdateOfferList();
         }
 
+        private void GoToTakenOffers(object sender, RoutedEventArgs e)
+        {
+            this.NavigationService.Navigate(new Uri("taken.xaml", UriKind.Relative));
+        }
+
         // ładuje oferty z bazy danych i akutalizuje listę oraz zmienną CachedOffers
         // może w przyszłości uda się zrobić to asynchronicznie?
         private void LoadOffers()
@@ -74,30 +79,18 @@ namespace go4work
             // zanim załadujemy nowe oferty wyczyść listę - zaczynamy od zera
             CachedOffers.Clear();
 
-            string command = $"select hotels.name as 'hotel_name', date, hours, salary from work_offers left join hotels on work_offers.hotel_id=hotels.id";
-
-            bool search_active = false; // czy where już zostało wcześniej dodane żeby się nie powtarzało
+            string today = DateTime.Now.ToString("yyyy-MM-dd"); // dzisiejsza data w formacie akceptowanym przez bazę danych
+            string command = $"select work_offers.id, hotels.name as 'hotel_name', date, hours, salary from work_offers left join hotels on work_offers.hotel_id=hotels.id where date >= '{today}' and taken = 0";
 
             // jeśli jakiekolwiek wyszukiwanie jest aktywne to dodajemy je do zapytania sql
             if (HotelList.SelectedItem != null && (HotelList.SelectedItem as ComboBoxItem).Tag.ToString() != "*")
             {
-                command += $" where hotel_id={Convert.ToInt32((HotelList.SelectedItem as ComboBoxItem).Tag)}";
-                search_active = true; // informujemy że już jest jakiś warunek
+                command += $" and hotel_id={Convert.ToInt32((HotelList.SelectedItem as ComboBoxItem).Tag)}";
             }
 
             if (DateFilter.SelectedDate != null)
             {
-                if (!search_active)
-                {
-                    command += " where ";
-                    search_active = true;
-                }
-                else
-                {
-                    command += " and ";
-                }
-
-                command += $"date='{DateFilter.SelectedDate.Value.ToString("yyyy-MM-dd")}'"; // w takim formacie daty przyjmuje baza danych
+                command += $" and date='{DateFilter.SelectedDate.Value.ToString("yyyy-MM-dd")}'"; // w takim formacie daty przyjmuje baza danych
             }
 
             SqlCommand sql_command = new SqlCommand(command, App.connection);
@@ -105,8 +98,8 @@ namespace go4work
 
             while (reader.Read())
             {
-                // wiersz bazy danych wygląda tak tak: hotel_name, data, godziny, wynagrodzenie
-                CachedOffers.Add(new work_offer(reader.GetString(0), reader.GetDateTime(1), reader.GetInt32(2), reader.GetInt32(3)));
+                // wiersz bazy danych wygląda tak tak: id, hotel_name, data, godziny, wynagrodzenie
+                CachedOffers.Add(new work_offer(reader.GetInt32(0), reader.GetString(1), reader.GetDateTime(2), reader.GetInt32(3), reader.GetInt32(4)));
             }
             reader.Close();
         }
@@ -136,7 +129,8 @@ namespace go4work
                     Hotel = offer.hotel_name,
                     Data = offer.date.ToShortDateString(),
                     Godziny = offer.hours.ToString(),
-                    Wynagrodzenie = offer.salary.ToString()
+                    Wynagrodzenie = offer.salary.ToString(),
+                    ID = offer.id.ToString()
                 };
 
                 // przesunięcie oferty na odpowiedni wiersz

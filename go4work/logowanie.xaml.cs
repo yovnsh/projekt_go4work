@@ -37,6 +37,8 @@ namespace go4work
 
             if (reader.Read() && str_haslo.Text == reader["password"].ToString())
             {
+                App.logged_user_id = str_pesel.Text;
+
                 MessageBox.Show("tez kocham kotki");
                 reader.Close();
 

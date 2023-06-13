@@ -12,27 +12,33 @@ namespace go4work
     struct work_offer
     {
         /// <summary>
-        /// nazwa hotelu - pierwsza kolumna bazy danych
+        /// indentyfikator oferty
+        /// </summary>
+        public int id;
+
+        /// <summary>
+        /// nazwa hotelu
         /// </summary>
         public string hotel_name;
 
         /// <summary>
-        /// data zlecenia - druga kolumna bazy danych
+        /// data zlecenia
         /// </summary>
         public DateTime date;
 
         /// <summary>
-        /// liczba godzin - trzecia kolumna bazy danych
+        /// liczba godzin
         /// </summary>
         public int hours;
 
         /// <summary>
-        /// płaca - czwarta kolumna bazy danych
+        /// płaca
         /// </summary>
         public int salary;
 
-        public work_offer(string hotel_name, DateTime date, int hours, int salary)
+        public work_offer(int id, string hotel_name, DateTime date, int hours, int salary)
         {
+            this.id = id;
             this.hotel_name = hotel_name;
             this.date = date;
             this.hours = hours;
