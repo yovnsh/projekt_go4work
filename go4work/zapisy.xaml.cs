@@ -29,12 +29,28 @@ namespace go4work
         // private static List<work_offer> CachedOffers = new List<work_offer>();
         // może trzeba zrobić dodatkową zmienną WasChached żeby nie ładować ofert za każdym razem jeśli nie ma żadnych ofert??
 
+        public const int OFFERS_PER_PAGE = 10;
+        public const int FIRST_PAGE = 0;
+
         public zapisy()
         {
             InitializeComponent();
 
-            LoadHotels();
-            LoadOffers();
+            OfferList.ItemsPerPage = OFFERS_PER_PAGE;
+            OfferList.PageCount = GetPages(); // ładujemy liczbę stron
+            OfferList.OfferReloader += OffersChangePage; // ustawiamy aktualizator stron
+
+            LoadHotels(); // ładujemy hotele do filtru hoteli
+            LoadOffers(FIRST_PAGE); // tylko pierwszą strona
+        }
+
+        /// <summary>
+        /// event handler dla zmiany strony ofert
+        /// </summary>
+        private void OffersChangePage(object? sender, EventArgs e)
+        {
+
+            LoadOffers((e as niewiem.ReloadEventArgs).RequestedPage);
         }
 
         #region Obsługa przycisków ------------
@@ -44,7 +60,7 @@ namespace go4work
         /// </summary>
         private void SearchOffers(object sender, RoutedEventArgs e)
         {
-            LoadOffers();
+            LoadOffers(FIRST_PAGE); // ładujemy od początku co powoduje zastosowanie filtrów
         }
 
         /// <summary>
@@ -57,7 +73,7 @@ namespace go4work
             DateFilter.SelectedDate = null;
 
             // załadowanie od nowa ofert korzysta z wartości z kontrolek więc samo powinno załadować bez filtrów
-            LoadOffers();
+            LoadOffers(FIRST_PAGE);
         }
 
         /// <summary>
@@ -83,7 +99,7 @@ namespace go4work
 
             MessageBox.Show("Zapisano na ofertę!");
 
-            LoadOffers();
+            LoadOffers(OfferList.CurrentPage); // ładujemy ponownie aktualną stronę
         }
 
         #endregion
@@ -93,24 +109,15 @@ namespace go4work
         /// <summary>
         /// ładuje oferty i odświeża listę - korzysta z kontrolek filtrów
         /// </summary>
-        private void LoadOffers()
+        private void LoadOffers(int page)
         {
             // zanim załadujemy nowe oferty wyczyść listę - zaczynamy od zera
             OfferList.Items.Clear();
 
-            string today = DateTime.Now.ToString("yyyy-MM-dd"); // dzisiejsza data w formacie akceptowanym przez bazę danych
-            string command = $"select work_offers.id, hotels.name as 'hotel_name', date, hours, salary from work_offers left join hotels on work_offers.hotel_id=hotels.id where date >= '{today}' and taken = 0";
+            //OfferList.PageCount = GetPages(); // aktualizujemy liczbę stron
 
-            // jeśli jakiekolwiek wyszukiwanie jest aktywne to dodajemy je do zapytania sql
-            if (HotelList.SelectedItem != null && (HotelList.SelectedItem as ComboBoxItem).Tag.ToString() != "*")
-            {
-                command += $" and hotel_id={Convert.ToInt32((HotelList.SelectedItem as ComboBoxItem).Tag)}";
-            }
-
-            if (DateFilter.SelectedDate != null)
-            {
-                command += $" and date='{DateFilter.SelectedDate.Value.ToString("yyyy-MM-dd")}'"; // w takim formacie daty przyjmuje baza danych
-            }
+            string command = $@"select work_offers.id, hotels.name as 'hotel_name', date, hours, salary from work_offers left join hotels on work_offers.hotel_id=hotels.id
+                                where {FiltersToSql()} order by date offset {page*OFFERS_PER_PAGE} rows fetch next {OFFERS_PER_PAGE} rows only"; // ta część odpowiada za stronicowanie wyników
 
             SqlCommand sql_command = new SqlCommand(command, App.connection);
             SqlDataReader reader = sql_command.ExecuteReader();
@@ -120,11 +127,11 @@ namespace go4work
                 // wiersz bazy danych wygląda tak tak: id, hotel_name, data, godziny, wynagrodzenie
                 OfferList.Items.Add(new work_offer()
                 {
-                    id = reader["id"].ToString() ?? work_offer.DEFAULT_ID,
-                    hotel_name = reader["hotel_name"].ToString() ?? work_offer.DEFAULT_HOTEL_NAME,
-                    date = reader["date"].ToString() ?? work_offer.DEFAULT_DATE,
-                    hours = reader["hours"].ToString() ?? work_offer.DEFAULT_HOURS,
-                    salary = reader["salary"].ToString() ?? work_offer.DEFAULT_SALARY
+                    id          = reader["id"].ToString()           ?? work_offer.DEFAULT_ID,
+                    hotel_name  = reader["hotel_name"].ToString()   ?? work_offer.DEFAULT_HOTEL_NAME,
+                    date        = reader["date"].ToString()         ?? work_offer.DEFAULT_DATE,
+                    hours       = reader["hours"].ToString()        ?? work_offer.DEFAULT_HOURS,
+                    salary      = reader["salary"].ToString()       ?? work_offer.DEFAULT_SALARY
                 });
             }
             reader.Close();
@@ -142,7 +149,7 @@ namespace go4work
             SqlDataReader reader = sql_command.ExecuteReader();
 
             HotelList.Items.Clear(); // najpierw trzeba wyczyścić wszystkie elementy z listy
-            HotelList.Items.Add(new ComboBoxItem() { Tag = "*", Content = "Wszystkie hotele", IsSelected = true }); // dodajemy opcję "wszystkie" na początek
+            HotelList.Items.Add(new ComboBoxItem() { Tag = "*", Content = "Wszystkie hotele", IsSelected=true }); // dodajemy opcję "wszystkie" na początek
 
             while (reader.Read())
             {
@@ -151,6 +158,55 @@ namespace go4work
             }
 
             reader.Close();
+        }
+
+        /// <summary>
+        /// generuje warunek dla wyszukiwań sql
+        /// zwrócony tekst jest postaci warunek1 and warunek2 and warunek3 itd.
+        /// </summary>
+        /// <example>
+        /// var command = $"select ... from ... where {FiltersToSql()}";
+        /// </example>
+        private string FiltersToSql()
+        {
+            string today = DateTime.Now.ToString("yyyy-MM-dd"); // dzisiejsza data w formacie akceptowanym przez bazę danych
+            string condition_string = $"date >= '{today}' and taken = 0"; // bazowe wymagania do których będziemy dodawać kolejne
+
+            if (HotelList.SelectedItem != null && (HotelList.SelectedItem as ComboBoxItem).Tag.ToString() != "*")
+            {
+                condition_string += $" and hotel_id={Convert.ToInt32((HotelList.SelectedItem as ComboBoxItem).Tag)}";
+            }
+
+            if (DateFilter.SelectedDate != null)
+            {
+                condition_string += $" and date='{DateFilter.SelectedDate.Value.ToString("yyyy-MM-dd")}'"; // w takim formacie daty przyjmuje baza danych
+            }
+
+            return condition_string;
+        }
+
+        /// <summary>
+        /// sprawdza ile jest stron wyników w aktualnych filtrach
+        /// </summary>
+        private int GetPages()
+        {
+            string command = $"select count(*) from work_offers where {FiltersToSql()}";
+            SqlCommand sql_command = new SqlCommand(command, App.connection);
+            SqlDataReader reader = sql_command.ExecuteReader();
+
+            if (!reader.Read())
+            {
+                Debug.WriteLine("Błąd ładowania liczby stron??");
+                return 1;
+                //TODO: coś z tym zrobić
+            }
+
+            int calculated_pages = reader.GetInt32(0) / OFFERS_PER_PAGE; // pamiętajmy że to dzielenie bez reszty
+            if (reader.GetInt32(0) % OFFERS_PER_PAGE != 0) calculated_pages++; // jeśli jest reszta to trzeba dodać jeszcze jedną stronę
+
+            reader.Close();
+
+            return calculated_pages;
         }
 
         #endregion

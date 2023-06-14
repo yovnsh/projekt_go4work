@@ -11,8 +11,9 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-
+        
         <!-- tytuły kolumn - w oddzielnym kontenerze żeby łatwo było edytować -->
         <Grid x:Name="Labels" Grid.Row="0">
             <!-- 4 kolumny o długość 25% -->
@@ -55,5 +56,16 @@
                 </ItemsControl>
             </Grid>
         </ScrollViewer>
+
+        <!-- nawigacja dolna (ze stronami) -->
+        <Grid x:Name="Navigation" Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <UniformGrid Grid.Column="1" x:Name="PageList" Rows="1"></UniformGrid>
+        </Grid>
     </Grid>
 </UserControl>
