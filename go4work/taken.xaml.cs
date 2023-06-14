@@ -25,7 +25,7 @@ namespace go4work
         {
             InitializeComponent();
 
-            string command = $"select offer_id, hotels.name as 'hotel_name', work_offers.date, work_offers.hours, work_offers.salary from taken_offers left join work_offers on offer_id = work_offers.id left join hotels on work_offers.hotel_id = hotels.id where employee_id = '{App.logged_user_id}'";
+            /*string command = $"select hotels.name as 'hotel_name', work_offers.date, work_offers.hours, work_offers.salary from taken_offers left join work_offers on offer_id = work_offers.id left join hotels on work_offers.hotel_id = hotels.id where employee_id = '{App.logged_user_id}'";
             SqlCommand sql_command = new SqlCommand(command, App.connection);
             SqlDataReader reader = sql_command.ExecuteReader();
 
@@ -38,17 +38,17 @@ namespace go4work
                 {
                     OfferList.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(50, GridUnitType.Pixel) });
                     var new_row = new niewiem(){
-                        Hotel = reader.GetString(1),
-                        Data = reader.GetDateTime(2).ToShortDateString(),
-                        Godziny = reader.GetInt32(3).ToString(),
-                        Wynagrodzenie = reader.GetInt32(4).ToString(),
-                        ID = reader.GetInt32(0).ToString()
+                        Hotel = reader.GetString(0),
+                        Data = reader.GetDateTime(1).ToShortDateString(),
+                        Godziny = reader.GetInt32(2).ToString(),
+                        Wynagrodzenie = reader.GetInt32(3).ToString(),
+                        //ID = reader.GetInt32(0).ToString()
                     };
                     Grid.SetRow(new_row, OfferList.RowDefinitions.Count-1);
                     OfferList.Children.Add(new_row);
                 }
             }
-            reader.Close();
+            reader.Close();*/
         }
 
         private void GoBack(object sender, RoutedEventArgs e)

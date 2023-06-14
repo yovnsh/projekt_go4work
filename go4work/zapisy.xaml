@@ -15,8 +15,13 @@
                 <GradientStop Color="#FFF1BCBC" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
         <!-- nawigacja -->
-        <Grid Height="80" VerticalAlignment="Top">
+        <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -24,17 +29,14 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <ComboBox x:Name="HotelList" HorizontalAlignment="Center" VerticalAlignment="Center" Width="120" Grid.Column="0">
-                <ComboBoxItem Tag="*" IsSelected="True" Content="Wszystkie hotele"/>
-            </ComboBox>
-            <DatePicker x:Name="DateFilter" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1"/>
-            <Button Content="Szukaj" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="2" Click="SearchOffers"/>
-            <Button Content="Wyczyść filtry" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="3" Click="ClearFilters"/>
-            <Button Content="Zapisane ofrty >" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="4" Click="GoToTakenOffers"/>
+            <ComboBox x:Name="HotelList" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0"></ComboBox>
+            <DatePicker x:Name="DateFilter" HorizontalAlignment="Center" VerticalAlignment="Center" Width="150" Grid.Column="1"/>
+            <Button Content="Szukaj" HorizontalAlignment="Center" VerticalAlignment="Center" Click="SearchOffers" Grid.Column="2"/>
+            <Button Content="Wyczyść filtry" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ClearFilters" Grid.Column="3"/>
+            <Button Content="Zapisane ofrty ->" HorizontalAlignment="Center" VerticalAlignment="Center" Click="GoToTakenOffers" Grid.Column="4"/>
         </Grid>
+
         <!-- lista ofert -->
-        <Grid x:Name="Offers" Margin="0,80,0,0">
-            <TextBlock Text="..." TextAlignment="Center"/>
-        </Grid>
+        <local:niewiem x:Name="OfferList" Grid.Row="1"></local:niewiem>
     </Grid>
 </Page>
