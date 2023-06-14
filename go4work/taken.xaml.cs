@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -32,9 +32,21 @@ namespace go4work
             RegisteredOffers.OfferReloader += OffersChangePage;
 
             RegisteredOffers.ButtonText = "Wypisz się";
-            RegisteredOffers.ButtonAction += (object? sender, EventArgs e) => MessageBox.Show("Wypisano");
+            RegisteredOffers.ButtonAction += UnRegister;
 
             LoadPage(0);
+        }
+
+        private void UnRegister(object? sender, EventArgs args)
+        {
+            string command = $@"delete from taken_offers where employee_id = '{App.logged_user_id}' and offer_id = '{(sender as Button).Tag}';
+                                update work_offers set taken = 0 where id = {(sender as Button).Tag}";
+            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
+            sql_command.ExecuteNonQuery();
+
+            MessageBox.Show("odrejestrowano");
+            LoadPage(RegisteredOffers.CurrentPage); // ładujemy aktualną stronę od nowa
+
         }
 
         private void OffersChangePage(object? sender, EventArgs e)
@@ -46,8 +58,8 @@ namespace go4work
         private int GetPages()
         {
             string command = $"select count(*) from taken_offers where employee_id = '{App.logged_user_id}'";
-            SqlCommand sql_command = new SqlCommand(command, App.connection);
-            SqlDataReader reader = sql_command.ExecuteReader();
+            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
+            SQLiteDataReader reader = sql_command.ExecuteReader();
 
             if (!reader.Read())
             {
@@ -78,10 +90,10 @@ namespace go4work
                                 left join hotels on work_offers.hotel_id = hotels.id
                                 where employee_id = '{App.logged_user_id}'
                                 order by work_offers.date
-                                offset {i * ITEMS_PER_PAGE} rows fetch next {ITEMS_PER_PAGE} rows only";
+                                limit {ITEMS_PER_PAGE} offset {i*ITEMS_PER_PAGE}";
 
-            SqlCommand sql_command = new SqlCommand(command, App.connection);
-            SqlDataReader reader = sql_command.ExecuteReader();
+            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
+            SQLiteDataReader reader = sql_command.ExecuteReader();
 
             RegisteredOffers.Items.Clear(); // zanim zmodyfikujemy to musimy wyczyścić
             while (reader.Read())
@@ -95,11 +107,17 @@ namespace go4work
                     salary = reader.GetInt32(4).ToString()
                 });
             }
+            reader.Close();
         }
 
         private void GoBack(object sender, RoutedEventArgs e)
         {
             this.NavigationService.Navigate(new Uri("zapisy.xaml", UriKind.Relative));
+        }
+
+        private void CreateOffer(object sender, RoutedEventArgs e)
+        {
+            this.NavigationService.Navigate(new Uri("DodajOferty.xaml", UriKind.Relative));
         }
     }
 }

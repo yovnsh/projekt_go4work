@@ -27,5 +27,6 @@
         </TextBox>
         <TextBox x:Name="str_haslo" HorizontalAlignment="Left" Margin="330,163,0,0" TextWrapping="Wrap" Text="hasło" VerticalAlignment="Top" Width="120"/>
         <Button Content="zaloguj" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Button_Click" Margin="368,207,0,0"/>
+        <Button Content="Nie masz konta?" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="621,373,0,0" Click="SignUp"/>
     </Grid>
 </Page>

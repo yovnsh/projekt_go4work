@@ -20,8 +20,9 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <Button Content="Wróć" Click="GoBack" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="72,44,0,0"></Button>
+            <Button Content="Wróć" Click="GoBack" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="34,0,0,0"></Button>
             <TextBlock HorizontalAlignment="Center" Text="Zapisane oferty" VerticalAlignment="Top" Height="50" Width="233" FontSize="30" Foreground="Black" TextAlignment="Center" Margin="0,29,0,0"/>
+            <Button Content="dodaj oferty" HorizontalAlignment="Left" VerticalAlignment="Center" Click="CreateOffer" Margin="731,0,0,0"/>
         </Grid>
         <local:niewiem x:Name="RegisteredOffers" Grid.Row="1"></local:niewiem>
     </Grid>

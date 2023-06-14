@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -96,7 +96,7 @@ namespace go4work
             string command = $@"insert into taken_offers (offer_id, employee_id) values ({button.Tag}, '{App.logged_user_id}');
                                 update work_offers set taken = 1 where id = {button.Tag};";
 
-            SqlCommand sql_command = new SqlCommand(command, App.connection);
+            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
             sql_command.ExecuteNonQuery();
 
             MessageBox.Show("Zapisano na ofertę!");
@@ -120,10 +120,10 @@ namespace go4work
             //OfferList.PageCount = GetPages(); // aktualizujemy liczbę stron
 
             string command = $@"select work_offers.id, hotels.name as 'hotel_name', date, hours, salary from work_offers left join hotels on work_offers.hotel_id=hotels.id
-                                where {FiltersToSql()} order by date offset {page * OFFERS_PER_PAGE} rows fetch next {OFFERS_PER_PAGE} rows only"; // ta część odpowiada za stronicowanie wyników
+                                where {FiltersToSql()} order by date limit {OFFERS_PER_PAGE} offset {page*OFFERS_PER_PAGE}"; // ta część odpowiada za stronicowanie wyników
 
-            SqlCommand sql_command = new SqlCommand(command, App.connection);
-            SqlDataReader reader = sql_command.ExecuteReader();
+            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
+            SQLiteDataReader reader = sql_command.ExecuteReader();
 
             while (reader.Read())
             {
@@ -148,8 +148,8 @@ namespace go4work
             // teoretycznie można dorobić żeby przechowywało stare zazanczenie pomiędzy odświeżeniami
 
             string command = $"select id, name from hotels;";
-            SqlCommand sql_command = new SqlCommand(command, App.connection);
-            SqlDataReader reader = sql_command.ExecuteReader();
+            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
+            SQLiteDataReader reader = sql_command.ExecuteReader();
 
             HotelList.Items.Clear(); // najpierw trzeba wyczyścić wszystkie elementy z listy
             HotelList.Items.Add(new ComboBoxItem() { Tag = "*", Content = "Wszystkie hotele", IsSelected = true }); // dodajemy opcję "wszystkie" na początek
@@ -194,8 +194,8 @@ namespace go4work
         private int GetPages()
         {
             string command = $"select count(*) from work_offers where {FiltersToSql()}";
-            SqlCommand sql_command = new SqlCommand(command, App.connection);
-            SqlDataReader reader = sql_command.ExecuteReader();
+            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
+            SQLiteDataReader reader = sql_command.ExecuteReader();
 
             if (!reader.Read())
             {

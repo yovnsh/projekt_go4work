@@ -1,0 +1,23 @@
+﻿<Page x:Class="go4work.DodajHotele"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:go4work"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="DodajHotele">
+
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="Black" Offset="1"/>
+                <GradientStop Color="#FFB58282"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Button Content="cofnij się" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="61,43,0,0" Click="GoBack"></Button>
+        <TextBlock Text="Dodaj hotel" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="36" Margin="0,29,0,0"/>
+        <TextBox x:Name="str_name" Margin="294,191,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="199"/>
+        <Button Content="Dodaj hotel" Margin="326,310,0,0" Click="AddHotel" HorizontalAlignment="Left" VerticalAlignment="Top" Width="136"></Button>
+    </Grid>
+</Page>

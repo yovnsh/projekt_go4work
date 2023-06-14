@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,8 +32,8 @@ namespace go4work
             //TODO: uprościć funkcję
 
             string command = $"select password from users where pesel='{str_pesel.Text}';";
-            SqlCommand sql_command = new SqlCommand(command, App.connection);
-            SqlDataReader reader = sql_command.ExecuteReader();
+            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
+            SQLiteDataReader reader = sql_command.ExecuteReader();
 
             if (reader.Read() && str_haslo.Text == reader["password"].ToString())
             {
@@ -49,6 +49,11 @@ namespace go4work
                 MessageBox.Show("wole pieski");
                 reader.Close();
             }
+        }
+
+        private void SignUp(object sender, RoutedEventArgs e)
+        {
+            this.NavigationService.Navigate(new Uri("rejestracja.xaml", UriKind.Relative));
         }
     }
 }
