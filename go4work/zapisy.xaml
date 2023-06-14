@@ -19,7 +19,7 @@
             <RowDefinition Height="80"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
         <!-- nawigacja -->
         <Grid>
             <Grid.ColumnDefinitions>
@@ -35,7 +35,7 @@
             <Button Content="Wyczyść filtry" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ClearFilters" Grid.Column="3"/>
             <Button Content="Zapisane ofrty ->" HorizontalAlignment="Center" VerticalAlignment="Center" Click="GoToTakenOffers" Grid.Column="4"/>
         </Grid>
-        
+
         <!-- lista ofert -->
         <local:niewiem x:Name="OfferList" Grid.Row="1"></local:niewiem>
     </Grid>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,34 +22,79 @@ namespace go4work
     /// </summary>
     public partial class taken : Page
     {
+        public const int ITEMS_PER_PAGE = 10;
+
         public taken()
         {
             InitializeComponent();
 
-            /*string command = $"select hotels.name as 'hotel_name', work_offers.date, work_offers.hours, work_offers.salary from taken_offers left join work_offers on offer_id = work_offers.id left join hotels on work_offers.hotel_id = hotels.id where employee_id = '{App.logged_user_id}'";
+            RegisteredOffers.ItemsPerPage = ITEMS_PER_PAGE;
+            RegisteredOffers.OfferReloader += OffersChangePage;
+
+            RegisteredOffers.ButtonText = "Wypisz się";
+            RegisteredOffers.ButtonAction += (object? sender, EventArgs e) => MessageBox.Show("Wypisano");
+
+            LoadPage(0);
+        }
+
+        private void OffersChangePage(object? sender, EventArgs e)
+        {
+            LoadPage((e as niewiem.ReloadEventArgs).RequestedPage);
+        }
+
+        // pobiera liczbę stron danych
+        private int GetPages()
+        {
+            string command = $"select count(*) from taken_offers where employee_id = '{App.logged_user_id}'";
             SqlCommand sql_command = new SqlCommand(command, App.connection);
             SqlDataReader reader = sql_command.ExecuteReader();
 
-            if(reader.FieldCount == 0)
+            if (!reader.Read())
             {
-                OfferList.Children.Add(new TextBlock() { Text = "Brak ofert" });
-            } else
-            {
-                while(reader.Read())
-                {
-                    OfferList.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(50, GridUnitType.Pixel) });
-                    var new_row = new niewiem(){
-                        Hotel = reader.GetString(0),
-                        Data = reader.GetDateTime(1).ToShortDateString(),
-                        Godziny = reader.GetInt32(2).ToString(),
-                        Wynagrodzenie = reader.GetInt32(3).ToString(),
-                        //ID = reader.GetInt32(0).ToString()
-                    };
-                    Grid.SetRow(new_row, OfferList.RowDefinitions.Count-1);
-                    OfferList.Children.Add(new_row);
-                }
+                Debug.WriteLine("Nie udało się pobrać liczby stron");
+                return 1;
             }
-            reader.Close();*/
+
+            int result = reader.GetInt32(0) / ITEMS_PER_PAGE; // liczba elementów / liczba elementów na stronę = strony
+            if (reader.GetInt32(0) % ITEMS_PER_PAGE != 0) // jeśli jest jakaś reszta z dzielenia to dodajemy jeszcze jedną stronę
+            {
+                result++;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// ładuje porcję ofert do listy
+        /// </summary>
+        /// <param name="i">numer strony</param>
+        private void LoadPage(int i)
+        {
+            // nie ma potrzeby sprawdzać ponownie liczby stron bo nie ma filtrów
+
+            string command = $@"select work_offers.id, hotels.name as 'hotel_name', work_offers.date, work_offers.hours, work_offers.salary 
+                                from taken_offers 
+                                left join work_offers on offer_id = work_offers.id
+                                left join hotels on work_offers.hotel_id = hotels.id
+                                where employee_id = '{App.logged_user_id}'
+                                order by work_offers.date
+                                offset {i * ITEMS_PER_PAGE} rows fetch next {ITEMS_PER_PAGE} rows only";
+
+            SqlCommand sql_command = new SqlCommand(command, App.connection);
+            SqlDataReader reader = sql_command.ExecuteReader();
+
+            RegisteredOffers.Items.Clear(); // zanim zmodyfikujemy to musimy wyczyścić
+            while (reader.Read())
+            {
+                RegisteredOffers.Items.Add(new work_offer()
+                {
+                    id = reader.GetInt32(0).ToString(),
+                    hotel_name = reader.GetString(1),
+                    date = reader.GetDateTime(2).ToShortDateString(),
+                    hours = reader.GetInt32(3).ToString(),
+                    salary = reader.GetInt32(4).ToString()
+                });
+            }
         }
 
         private void GoBack(object sender, RoutedEventArgs e)

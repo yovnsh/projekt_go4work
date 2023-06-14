@@ -53,12 +53,13 @@ namespace go4work
         /// numer aktualnej strony (zaznaczona strona w nawigacji na dole)
         /// zmiana powoduje wywołanie żądania przeładowania ofert
         /// </summary>
-        public int CurrentPage { 
+        public int CurrentPage
+        {
             get => _current_page;
             set
             {
                 // zabezpieczenie przed nieprawidłowymi danymi
-                if(value < 0 || value >= PageCount)
+                if (value < 0 || value >= PageCount)
                 {
                     Debug.WriteLine("Próba ustawienia nieprawidłowej strony");
                     return;
@@ -85,16 +86,26 @@ namespace go4work
         /// liczba wszystkich stron (od tego zależy nawigacja na dole)
         /// jeśli jesteśmy na dalszej stronie niż chcemy ustawić to możliwie konieczne będzie przeładowanie ofert
         /// </summary>
-        public int PageCount { 
+        public int PageCount
+        {
             get => _page_count;
             set
             {
-                // jeśli wartość nie jest poprawna to nie robimy nic
-                if (value < 1)
+                // jeśli nic się nie zmieniło to nie ma sensu nic robić
+                if (value == _page_count)
                 {
-                    Debug.WriteLine("Próba ustawienia nieprawidłowej liczby stron");
                     return;
                 }
+
+                // jeśli liczba stron jest zerowa lub ujemna to pokazujemy tekst brak ofert 
+                if (value < 1)
+                {
+                    NoItems.Visibility = Visibility.Visible; // w tym jednym wypadku pokazujemy co tam mamy
+                    Navigation.Visibility = Visibility.Collapsed; // chowamy nawigację skoro i tak nie ma stron
+                    _page_count = 0;
+                    return;
+                }
+                NoItems.Visibility = Visibility.Collapsed; // nomralnie zawsze chowamy komunikat o braku ofert
 
                 // jeśli nie jest potrzebne wgl stronicowanie to chowamy nawigację
                 if (value == 1)
@@ -108,6 +119,7 @@ namespace go4work
                 }
 
                 // jeśli jesteśmy na stronie dalejszej niż jest to ustawiamy na ostatnią
+                // TODO: albo na 0
                 if (CurrentPage >= value)
                 {
                     CurrentPage = value - 1;
@@ -117,7 +129,7 @@ namespace go4work
                 GenerateNavigation(); // po zmianie ilości stron trzeba od nowa wygenerować nawigację
             }
         }
-        private int _page_count = 1;
+        private int _page_count = 0;
 
         /// <summary>
         /// funkcja która powinna być wywoływana gdy chcemy przeładować oferty
@@ -132,6 +144,17 @@ namespace go4work
             public int RequestedPage { get; set; }
         }
 
+        /// <summary>
+        /// tekst przekazywany do przycisków
+        /// </summary>
+        public string ButtonText { get; set; } = "hehe button";
+
+        /// <summary>
+        /// akcja wykonywana przy kliknięciu dowolnego przycisku
+        /// (każdy przycisk ma właściwość Tag)
+        /// </summary>
+        public event EventHandler<EventArgs>? ButtonAction;
+
         #endregion
 
         public niewiem()
@@ -140,7 +163,7 @@ namespace go4work
 
             this.DataContext = this;
 
-            GenerateNavigation();
+            //GenerateNavigation();
         }
 
         public niewiem(int limit, int n_pages = 1) : this()
@@ -160,19 +183,21 @@ namespace go4work
             // jeśli jest mniej niż 5 stron to wypisujemy wszystkie
             if (PageCount <= 5)
             {
-                for(int n = 0; n < PageCount; n++)
+                for (int n = 0; n < PageCount; n++)
                 {
-                    var btn = new Button() {
-                        HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
+                    var btn = new Button()
+                    {
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
                         Padding = new Thickness(5, 5, 5, 5),
-                        Content = (n+1).ToString(), // numer strony
+                        Content = (n + 1).ToString(), // numer strony
                         Tag = n.ToString(),         // też numer strony tylko od 0 numerowany
                     };
                     btn.Click += NavigateToPage; // obsługa klikania na strony
 
                     PageList.Children.Add(btn);
                 }
-            } 
+            }
             else
             {
                 // robimy układ guzików 1 2 3 4 ... l lub 1 ... n-1 n n+1 ... l
@@ -202,7 +227,7 @@ namespace go4work
 
                 int start_index; // od jakiej liczby zaczynamy potem dodawac trzy guziki - przydatne później
 
-                if (CurrentPage > 2) 
+                if (CurrentPage > 2)
                 {
                     // jeśli jest jakaś znaczącza przerwa to wstawiamy trzykropek
                     PageList.Children.Add(new TextBlock() // trzykropek po guziku
@@ -213,19 +238,20 @@ namespace go4work
                     // jeśli odległość jest większa niż 2 to robimy (1 ... n-1 n n+1 ... last) czyli zaczynamy od n-1 aż po n+1
                     start_index = CurrentPage - 1;
 
-                } else
+                }
+                else
                 {
                     // jeśli odległość jest mniejsza niż 2 to pokazujemy 1 2 3 4 ... last - czyli wypisujemy 1 i 3 następne liczby począwszy od 2 (1 liczone od 0)
-                    start_index = 1; 
+                    start_index = 1;
                 }
 
                 // --- 3 następne guziki ---
                 int end_index = start_index + 3; // na którym numerku mamy zakończyć
 
-                if(end_index >= PageCount) // jeśli jesteśmy na ostatniej stronie to nie możemy wypisać 3 następnych guzików
+                if (end_index >= PageCount) // jeśli jesteśmy na ostatniej stronie to nie możemy wypisać 3 następnych guzików
                 {
                     start_index = PageCount - 4; // cofamy indeks do tyłu o 1
-                    end_index = PageCount-1; // więc wypisujemy do przedostatniego (bo ostatni jeszcze sam sie wstawi)
+                    end_index = PageCount - 1; // więc wypisujemy do przedostatniego (bo ostatni jeszcze sam sie wstawi)
                 }
 
                 for (int n = start_index; n < end_index; n++)
@@ -243,7 +269,7 @@ namespace go4work
                     PageList.Children.Add(btn);
                 }
 
-                if(CurrentPage < PageCount - 3)
+                if (CurrentPage < PageCount - 3)
                 {
                     // jeśli jest jakaś znaczącza przerwa to wstawiamy trzykropek
                     PageList.Children.Add(new TextBlock()
@@ -267,7 +293,7 @@ namespace go4work
             // włączamy wszystkie pozostałe poza aktualną
             foreach (UIElement btn in PageList.Children)
             {
-                if(btn is Button && Convert.ToInt32((btn as Button).Tag.ToString()) != CurrentPage)
+                if (btn is Button && Convert.ToInt32((btn as Button).Tag.ToString()) != CurrentPage)
                     btn.IsEnabled = true;
                 else
                     btn.IsEnabled = false;
@@ -282,6 +308,11 @@ namespace go4work
         {
 
             CurrentPage = Convert.ToInt32((sender as Button).Tag.ToString());
+        }
+
+        private void ButtonClick(object? sender, RoutedEventArgs e)
+        {
+            ButtonAction?.Invoke(sender, e);
         }
     }
 }

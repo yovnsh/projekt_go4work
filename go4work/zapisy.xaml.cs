@@ -37,8 +37,10 @@ namespace go4work
             InitializeComponent();
 
             OfferList.ItemsPerPage = OFFERS_PER_PAGE;
-            OfferList.PageCount = GetPages(); // ładujemy liczbę stron
             OfferList.OfferReloader += OffersChangePage; // ustawiamy aktualizator stron
+
+            OfferList.ButtonText = "Zapisz się"; // ustawiamy tekst na guziku
+            OfferList.ButtonAction += Register;
 
             LoadHotels(); // ładujemy hotele do filtru hoteli
             LoadOffers(FIRST_PAGE); // tylko pierwszą strona
@@ -87,7 +89,7 @@ namespace go4work
         /// <summary>
         /// obsługa guzików "Zapisz" - zapisuje użytkownika na ofertę pracy
         /// </summary>
-        private void Register(object sender, RoutedEventArgs e)
+        private void Register(object? sender, EventArgs e)
         {
             var button = sender as Button;
 
@@ -113,11 +115,12 @@ namespace go4work
         {
             // zanim załadujemy nowe oferty wyczyść listę - zaczynamy od zera
             OfferList.Items.Clear();
+            OfferList.PageCount = GetPages(); // aktualizujemy liczbę stron
 
             //OfferList.PageCount = GetPages(); // aktualizujemy liczbę stron
 
             string command = $@"select work_offers.id, hotels.name as 'hotel_name', date, hours, salary from work_offers left join hotels on work_offers.hotel_id=hotels.id
-                                where {FiltersToSql()} order by date offset {page*OFFERS_PER_PAGE} rows fetch next {OFFERS_PER_PAGE} rows only"; // ta część odpowiada za stronicowanie wyników
+                                where {FiltersToSql()} order by date offset {page * OFFERS_PER_PAGE} rows fetch next {OFFERS_PER_PAGE} rows only"; // ta część odpowiada za stronicowanie wyników
 
             SqlCommand sql_command = new SqlCommand(command, App.connection);
             SqlDataReader reader = sql_command.ExecuteReader();
@@ -127,11 +130,11 @@ namespace go4work
                 // wiersz bazy danych wygląda tak tak: id, hotel_name, data, godziny, wynagrodzenie
                 OfferList.Items.Add(new work_offer()
                 {
-                    id          = reader["id"].ToString()           ?? work_offer.DEFAULT_ID,
-                    hotel_name  = reader["hotel_name"].ToString()   ?? work_offer.DEFAULT_HOTEL_NAME,
-                    date        = reader["date"].ToString()         ?? work_offer.DEFAULT_DATE,
-                    hours       = reader["hours"].ToString()        ?? work_offer.DEFAULT_HOURS,
-                    salary      = reader["salary"].ToString()       ?? work_offer.DEFAULT_SALARY
+                    id = reader["id"].ToString() ?? work_offer.DEFAULT_ID,
+                    hotel_name = reader["hotel_name"].ToString() ?? work_offer.DEFAULT_HOTEL_NAME,
+                    date = reader["date"].ToString() ?? work_offer.DEFAULT_DATE,
+                    hours = reader["hours"].ToString() ?? work_offer.DEFAULT_HOURS,
+                    salary = reader["salary"].ToString() ?? work_offer.DEFAULT_SALARY
                 });
             }
             reader.Close();
@@ -149,7 +152,7 @@ namespace go4work
             SqlDataReader reader = sql_command.ExecuteReader();
 
             HotelList.Items.Clear(); // najpierw trzeba wyczyścić wszystkie elementy z listy
-            HotelList.Items.Add(new ComboBoxItem() { Tag = "*", Content = "Wszystkie hotele", IsSelected=true }); // dodajemy opcję "wszystkie" na początek
+            HotelList.Items.Add(new ComboBoxItem() { Tag = "*", Content = "Wszystkie hotele", IsSelected = true }); // dodajemy opcję "wszystkie" na początek
 
             while (reader.Read())
             {

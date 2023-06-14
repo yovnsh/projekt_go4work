@@ -13,11 +13,12 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-        
+
         <!-- tytuły kolumn - w oddzielnym kontenerze żeby łatwo było edytować -->
         <Grid x:Name="Labels" Grid.Row="0">
             <!-- 4 kolumny o długość 25% -->
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -31,6 +32,11 @@
 
         </Grid>
 
+
+        <!-- komunikat jeśli brak danych (domyślnie ukryty) -->
+        <Grid x:Name="NoItems" Grid.Row="1"  Visibility="Collapsed">
+            <TextBlock Text="Brak danych" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Red"/>
+        </Grid>
         <!-- lista ofert -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <Grid>
@@ -44,12 +50,15 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding hotel_name}"/>
                                 <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding date}"/>
                                 <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding hours}"/>
                                 <TextBlock Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding salary}"/>
+                                <Button Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ButtonClick"
+                                        Tag="{Binding id}" Content="{Binding ButtonText, RelativeSource={RelativeSource AncestorType=local:niewiem}}"/>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -57,8 +66,8 @@
             </Grid>
         </ScrollViewer>
 
-        <!-- nawigacja dolna (ze stronami) -->
-        <Grid x:Name="Navigation" Grid.Row="2">
+        <!-- nawigacja dolna (ze stronami) [domyślnie ukryta] -->
+        <Grid x:Name="Navigation" Grid.Row="2" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
