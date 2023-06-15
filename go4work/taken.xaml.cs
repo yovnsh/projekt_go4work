@@ -119,5 +119,15 @@ namespace go4work
         {
             this.NavigationService.Navigate(new Uri("DodajOferty.xaml", UriKind.Relative));
         }
+
+        private void RegisteredOffers_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RegisteredOffers_Loaded_1(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

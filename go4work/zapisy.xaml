@@ -8,13 +8,7 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="zapisy">
 
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="Black"/>
-                <GradientStop Color="#FFF1BCBC" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.Background>
+    <Grid Background="#FFE8CEC7">
         <Grid.RowDefinitions>
             <RowDefinition Height="80"/>
             <RowDefinition Height="*"/>
@@ -34,9 +28,11 @@
             <Button Content="Szukaj" HorizontalAlignment="Center" VerticalAlignment="Center" Click="SearchOffers" Grid.Column="2" RenderTransformOrigin="0.325,6.714"/>
             <Button Content="Wyczyść filtry" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ClearFilters" Grid.Column="3"/>
             <Button Content="Zapisane ofrty ->" HorizontalAlignment="Center" VerticalAlignment="Center" Click="GoToTakenOffers" Grid.Column="4"/>
+            
         </Grid>
 
         <!-- lista ofert -->
         <local:niewiem x:Name="OfferList" Grid.Row="1"></local:niewiem>
+        <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="354" Grid.Row="1" VerticalAlignment="Center" Width="748"/>
     </Grid>
 </Page>

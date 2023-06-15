@@ -27,10 +27,13 @@ namespace go4work
 
             Debug.WriteLine("udało się połączyć z bazą danych");
 
-            string users_table = "create table if not exists users (pesel varchar(11) primary key, password varchar(50));";
-            string hotels_table = "create table if not exists hotels (id integer primary key autoincrement, name varchar(50));";
-            string work_offers_table = "create table if not exists work_offers (id integer primary key autoincrement, hotel_id int, date datetime, hours int, salary int, taken int2, foreign key(hotel_id) references hotels(id));";
-            string taken_offers_table = "create table if not exists taken (employee_id int, offer_id int, foreign key(employee_id) references users(pesel), foreign key(offer_id) references work_offers(id))";
+            string users_table = "create table if not exists users (pesel text primary key, name text, surname text, password text, city text, street text, apartament_number text, card_number text, telephone_number text);";
+            string hotels_table = @"create table if not exists hotels (id integer primary key autoincrement, name text);
+                                    insert into hotels (name) values ('ibis'), ('merkury'), ('metropolo'), ('hilton'), ('premier')";
+            string work_offers_table = @"create table if not exists work_offers (id integer primary key autoincrement, hotel_id int, date datetime, hours int, salary int, taken int2, foreign key(hotel_id) references hotels(id));
+                                         insert into work_offers(hotel_id, date, hours, salary, taken)
+                                         values (0, '2023-06-14', 25, 2, 0), (1, '2022-06-20', 5, 20, 0), (1, '2024-07-01', 6, 19, 0), (1, '2024-07-02', 5, 18, 0)";
+            string taken_offers_table = "create table if not exists taken_offers (employee_id int, offer_id int, foreign key(employee_id) references users(pesel), foreign key(offer_id) references work_offers(id))";
 
             SQLiteCommand sql_command;
 

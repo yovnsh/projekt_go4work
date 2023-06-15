@@ -8,22 +8,17 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="taken">
 
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="Black"/>
-                <GradientStop Color="#FFF1BCBC" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.Background>
+    <Grid Background="#FFE8CEC7">
         <Grid.RowDefinitions>
             <RowDefinition Height="76"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <Grid>
             <Button Content="Wróć" Click="GoBack" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="34,0,0,0"></Button>
-            <TextBlock HorizontalAlignment="Center" Text="Zapisane oferty" VerticalAlignment="Top" Height="50" Width="233" FontSize="30" Foreground="Black" TextAlignment="Center" Margin="0,29,0,0"/>
+            <TextBlock FontFamily="Tw Cen MT" Text="Zapisane oferty" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="36" Margin="0,20,0,0"/>
             <Button Content="dodaj oferty" HorizontalAlignment="Left" VerticalAlignment="Center" Click="CreateOffer" Margin="731,0,0,0"/>
         </Grid>
-        <local:niewiem x:Name="RegisteredOffers" Grid.Row="1"></local:niewiem>
+        <local:niewiem x:Name="RegisteredOffers" Grid.Row="1" Loaded="RegisteredOffers_Loaded_1"/>
+        <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="354" Grid.Row="1" VerticalAlignment="Center" Width="748"/>
     </Grid>
 </Page>

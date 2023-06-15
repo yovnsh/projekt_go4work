@@ -25,6 +25,7 @@ namespace go4work
         public logowanie()
         {
             InitializeComponent();
+            this.FontFamily = new FontFamily("Segoe UI");
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -39,14 +40,14 @@ namespace go4work
             {
                 App.logged_user_id = str_pesel.Text;
 
-                MessageBox.Show("tez kocham kotki");
+                MessageBox.Show("zalogowano");
                 reader.Close();
 
                 this.NavigationService.Navigate(new Uri("zapisy.xaml", UriKind.Relative));
             }
             else
             {
-                MessageBox.Show("wole pieski");
+                MessageBox.Show("błędnie wpisany pesel lub hasło");
                 reader.Close();
             }
         }

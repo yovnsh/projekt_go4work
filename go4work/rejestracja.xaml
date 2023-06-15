@@ -8,16 +8,30 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="rejestracja">
 
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="Black" Offset="1"/>
-                <GradientStop Color="#FFB58282"/>
-            </LinearGradientBrush>
-        </Grid.Background>
-        <TextBlock Text="REJETRACJA" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="36" Margin="0,50,0,0"/>
-        <TextBox x:Name="str_pesel" Margin="317,151,317,272"></TextBox>
-        <TextBox x:Name="str_password" Margin="317,198,317,225"></TextBox>
-        <Button Content="Rejestruj" Margin="310,299,310,120" Click="SignUp"></Button>
+    <Grid Background="#FFE8CEC7">
+        <TextBlock FontFamily="Tw Cen MT" Text="Zarejestruj się" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="36" Margin="0,20,0,0"/>
+        <UniformGrid Columns="1" Width="175" Margin="313,81,312,85">
+            <TextBox Text="pesel" x:Name="str_pesel" VerticalAlignment="Top"/>
+            <TextBox Text="haslo" x:Name="str_password" VerticalAlignment="Top"/>
+            <TextBox Text="imie" x:Name="str_name" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+            <TextBox Text="nazwisko" x:Name="str_surname" VerticalAlignment="Top"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" Text="nr domu" x:Name="str_hous_n" HorizontalAlignment="Left" VerticalAlignment="Top" Width="77" />
+                <TextBox Grid.Column="1" Text="nr apartamentu" x:Name="str_aparament_n" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Margin="8,0,0,0"/>
+            </Grid>
+            <TextBox Text="miasto" x:Name="str_city" VerticalAlignment="Top" TextChanged="str_city_TextChanged"/>
+            <TextBox Text="ulica" x:Name="str_street" HorizontalAlignment="Stretch" VerticalAlignment="Top" />
+
+            <TextBox Text="numer karty" x:Name="str_card_n" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+            <TextBox Text="numer telefonu" x:Name="str_telephone_n" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+        </UniformGrid>
+        <Button Content="Zarejestruj" HorizontalAlignment="Center" VerticalAlignment="Top" Width="176" Click="SignUp" Margin="0,370,0,0" BorderBrush="#FFA7A7A7"/>
+        <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="391" Margin="0,20,0,0" VerticalAlignment="Top" Width="236"/>
+        <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="370" Margin="0,59,0,0" VerticalAlignment="Top" Width="199"/>
+        
     </Grid>
 </Page>

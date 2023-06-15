@@ -29,7 +29,7 @@ namespace go4work
         }
 
         /// <summary>
-        /// ładuje hotele do filtra hoteli XD
+        /// ładuje hotele do filtra hoteli 
         /// </summary>
         private void LoadHotels()
         {
