@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -33,7 +32,7 @@ namespace go4work
         /// zmodyfikowanie tej kolekcji powoduje automatyczną zmianę wyświetlonych ofert
         /// jeśli będzie przechowywać więcej elementów niż ItemsPerPage to nie zostaną one wyświetlone
         /// </summary>
-        public LimitedObservableCollection<work_offer> Items { get; set; } = new LimitedObservableCollection<work_offer>(DEFAULT_ITEMS_PER_PAGE);
+        public LimitedObservableCollection<Models.JobOffer> Items { get; set; } = new LimitedObservableCollection<Models.JobOffer>(DEFAULT_ITEMS_PER_PAGE);
 
         /// <summary>
         /// domyślna liczba ofert wyświetlanych na stronie
@@ -147,7 +146,7 @@ namespace go4work
         /// <summary>
         /// tekst przekazywany do przycisków
         /// </summary>
-        public string ButtonText { get; set; } = "hehe button";
+        public string ButtonText { get; set; } = "";
 
         /// <summary>
         /// akcja wykonywana przy kliknięciu dowolnego przycisku

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -22,6 +21,9 @@ namespace go4work
     /// </summary>
     public partial class taken : Page
     {
+        /// <summary>
+        /// liczba ofert wyświetlanych na stronie
+        /// </summary>
         public const int ITEMS_PER_PAGE = 10;
 
         public taken()
@@ -37,14 +39,27 @@ namespace go4work
             LoadPage(0);
         }
 
+        /// <summary>
+        /// przycisk wyrejestrowania z oferty
+        /// </summary>
         private void UnRegister(object? sender, EventArgs args)
         {
-            string command = $@"delete from taken_offers where employee_id = '{App.logged_user_id}' and offer_id = '{(sender as Button).Tag}';
-                                update work_offers set taken = 0 where id = {(sender as Button).Tag}";
-            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
-            sql_command.ExecuteNonQuery();
+            // usuwa ofertę z listy zarejestrowanych i zmienia jej status na wolny
+            // TODO: sprawdzić czy da się lepiej to zrobić
+            try
+            {
+                App.db.JobOffers.Remove(App.db.JobOffers.Find((sender as Button).Tag));
+                App.db.JobOffers.Find((sender as Button).Tag).WasAccepted = false;
+                App.db.SaveChanges();
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show("błąd wyrejestrowania");
+                Debug.WriteLine($"UnRegister: {e.Message}");
+            }
 
-            MessageBox.Show("odrejestrowano");
+            MessageBox.Show("wyrejestrowano!");
+
             LoadPage(RegisteredOffers.CurrentPage); // ładujemy aktualną stronę od nowa
 
         }
@@ -54,21 +69,17 @@ namespace go4work
             LoadPage((e as niewiem.ReloadEventArgs).RequestedPage);
         }
 
-        // pobiera liczbę stron danych
+        /// <summary>
+        /// pobiera liczbę stron
+        /// </summary>
         private int GetPages()
         {
-            string command = $"select count(*) from taken_offers where employee_id = '{App.logged_user_id}'";
-            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
-            SQLiteDataReader reader = sql_command.ExecuteReader();
+            var query = from offer in App.db.AcceptedOffers
+                        where offer.UserPesel == App.logged_user_id
+                        select offer;
 
-            if (!reader.Read())
-            {
-                Debug.WriteLine("Nie udało się pobrać liczby stron");
-                return 1;
-            }
-
-            int result = reader.GetInt32(0) / ITEMS_PER_PAGE; // liczba elementów / liczba elementów na stronę = strony
-            if (reader.GetInt32(0) % ITEMS_PER_PAGE != 0) // jeśli jest jakaś reszta z dzielenia to dodajemy jeszcze jedną stronę
+            int result = query.Count() / ITEMS_PER_PAGE; // liczba elementów / liczba elementów na stronę = strony
+            if (query.Count() % ITEMS_PER_PAGE != 0) // jeśli jest jakaś reszta z dzielenia to dodajemy jeszcze jedną stronę
             {
                 result++;
             }
@@ -83,38 +94,36 @@ namespace go4work
         private void LoadPage(int i)
         {
             // nie ma potrzeby sprawdzać ponownie liczby stron bo nie ma filtrów
+            var query = from offer in App.db.AcceptedOffers
+                        where offer.UserPesel == App.logged_user_id
+                        select offer;
 
-            string command = $@"select work_offers.id, hotels.name as 'hotel_name', work_offers.date, work_offers.hours, work_offers.salary 
-                                from taken_offers 
-                                left join work_offers on offer_id = work_offers.id
-                                left join hotels on work_offers.hotel_id = hotels.id
-                                where employee_id = '{App.logged_user_id}'
-                                order by work_offers.date
-                                limit {ITEMS_PER_PAGE} offset {i*ITEMS_PER_PAGE}";
+            var result = query.Skip(i*ITEMS_PER_PAGE).Take(ITEMS_PER_PAGE).ToList();
 
-            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
-            SQLiteDataReader reader = sql_command.ExecuteReader();
-
-            RegisteredOffers.Items.Clear(); // zanim zmodyfikujemy to musimy wyczyścić
-            while (reader.Read())
+            foreach (var item in result)
             {
-                RegisteredOffers.Items.Add(new work_offer()
+                try
                 {
-                    id = reader.GetInt32(0).ToString(),
-                    hotel_name = reader.GetString(1),
-                    date = reader.GetDateTime(2).ToShortDateString(),
-                    hours = reader.GetInt32(3).ToString(),
-                    salary = reader.GetInt32(4).ToString()
-                });
+                    RegisteredOffers.Items.Add(item.JobOffer);
+                }
+                catch(Exception e)
+                {
+                    Debug.WriteLine($"Błąd wyświetlania oferty: {e.Message}");
+                }
             }
-            reader.Close();
         }
 
+        /// <summary>
+        /// obsługuje przycisk powrotu do poprzedniej strony
+        /// </summary>
         private void GoBack(object sender, RoutedEventArgs e)
         {
             this.NavigationService.Navigate(new Uri("zapisy.xaml", UriKind.Relative));
         }
 
+        /// <summary>
+        /// obsługuje przycisk przejścia do strony dodawania oferty
+        /// </summary>
         private void CreateOffer(object sender, RoutedEventArgs e)
         {
             this.NavigationService.Navigate(new Uri("DodajOferty.xaml", UriKind.Relative));

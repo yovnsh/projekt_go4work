@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,46 +25,100 @@ namespace go4work
         {
             InitializeComponent();
 
-            LoadHotels(); // ładujemy wybory hotteli
+            LoadHotels(); // ładujemy wybory hoteli
         }
 
         /// <summary>
-        /// ładuje hotele do filtra hoteli 
+        /// ładuje hotele do filtra hoteli
         /// </summary>
         private void LoadHotels()
         {
             // teoretycznie można dorobić żeby przechowywało stare zazanczenie pomiędzy odświeżeniami
 
-            string command = $"select id, name from hotels;";
-            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
-            SQLiteDataReader reader = sql_command.ExecuteReader();
+            var query = from hotel in App.db.Hotels
+                        select new { hotel.ID, hotel.Name };
 
             Hotels.Items.Clear(); // najpierw trzeba wyczyścić wszystkie elementy z listy
 
-            while (reader.Read())
+            foreach(var hotel in query)
             {
-                // dopiero potem dodajemy od nowa
-                Hotels.Items.Add(new ComboBoxItem() { Tag = reader.GetInt32(0), Content = reader.GetString(1) });
+                Hotels.Items.Add(new ComboBoxItem() { Tag = hotel.ID, Content = hotel.Name });
             }
-
-            reader.Close();
         }
 
+        /// <summary>
+        /// obsługuje kliknięcie guzika "dodaj ofertę"
+        /// tworzy nową ofertę w bazie danych na podstawie danych z formularza
+        /// </summary>
         private void AddOffer(object? sender, RoutedEventArgs args)
         {
-            string command = $@"insert into work_offers (hotel_id, date, hours, salary, taken) 
-                                values ({(Hotels.SelectedItem as ComboBoxItem).Tag}, '{Data.SelectedDate.Value.ToString("yyyy-MM-dd")}', {str_hours.Text}, {str_salary.Text}, 0)";
-            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
-            sql_command.ExecuteNonQuery();
+            if (Hotels.SelectedItem == null)
+            {
+                MessageBox.Show("Wybierz hotel");
+                return;
+            }
+
+            if (Data.SelectedDate == null)
+            {
+                MessageBox.Show("Wybierz datę");
+                return;
+            }
+
+            if (str_hours.Text == "")
+            {
+                MessageBox.Show("Podaj ilość godzin");
+                return;
+            }
+
+            if(str_salary.Text == "")
+            {
+                MessageBox.Show("Podaj wynagrodzenie");
+                return;
+            }
+
+            ComboBoxItem? choosen_hotel = Hotels.SelectedItem as ComboBoxItem;
+            if (choosen_hotel == null)
+            {
+                MessageBox.Show("Błąd dodawania oferty");
+                Debug.WriteLine("AddOffer: selecteditem nie jest comboboxitem???");
+                return;
+            }
+
+            //TODO: walidacja danych
+
+            try
+            {
+                App.db.JobOffers.Add(new Models.JobOffer()
+                {
+                    HotelID = Convert.ToInt32(choosen_hotel.Tag.ToString()),
+                    Date = Data.SelectedDate.Value,
+                    Hours = Convert.ToInt32(str_hours.Text),
+                    Salary = Convert.ToInt32(str_salary.Text)
+                });
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show("Błąd dodawania oferty");
+                Debug.WriteLine("AddOffer: " + e.Message);
+                return;
+            }
 
             MessageBox.Show("Dodano ofertę pracy");
         }
 
+        /// <summary>
+        /// obsługuje guzik "wróć"
+        /// </summary>
         private void GoBack(object sender, RoutedEventArgs e)
         {
+            //TODO: poprawić nawigację tak żeby pokazywała do konkretnego miejsca
             this.NavigationService.GoBack();
         }
 
+        /// <summary>
+        /// obsługuje guzik "dodaj hotel"
+        /// przechodzi do strony dodawania hoteli
+        /// </summary>
         private void AddHotel(object sender, RoutedEventArgs e)
         {
             this.NavigationService.Navigate(new Uri("DodajHotele.xaml", UriKind.Relative));

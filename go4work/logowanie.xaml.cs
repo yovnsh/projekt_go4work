@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,30 +27,34 @@ namespace go4work
             this.FontFamily = new FontFamily("Segoe UI");
         }
 
+        /// <summary>
+        /// obsługuje guzik logowania (sprawdza czy użytkownik istnieje w bazie danych i hasło się zgadza)
+        /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: uprościć funkcję
+            var query = from user in App.db.Users
+                        where user.Pesel == str_pesel.Text && user.Password == str_haslo.Text
+                        select new { user.Pesel, user.Password };
 
-            string command = $"select password from users where pesel='{str_pesel.Text}';";
-            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
-            SQLiteDataReader reader = sql_command.ExecuteReader();
-
-            if (reader.Read() && str_haslo.Text == reader["password"].ToString())
+            try
             {
-                App.logged_user_id = str_pesel.Text;
+                var result = query.Single();
 
+                App.logged_user_id = result.Pesel;
                 MessageBox.Show("zalogowano");
-                reader.Close();
 
                 this.NavigationService.Navigate(new Uri("zapisy.xaml", UriKind.Relative));
             }
-            else
+            catch(InvalidOperationException)
             {
                 MessageBox.Show("błędnie wpisany pesel lub hasło");
-                reader.Close();
+                return;
             }
         }
 
+        /// <summary>
+        /// obsługuje guzik rejestracji (przenosi do strony rejestracji)
+        /// </summary>
         private void SignUp(object sender, RoutedEventArgs e)
         {
             this.NavigationService.Navigate(new Uri("rejestracja.xaml", UriKind.Relative));

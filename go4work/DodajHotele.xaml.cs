@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,11 +34,19 @@ namespace go4work
 
         private void AddHotel(object sender, RoutedEventArgs e)
         {
-            string command = $"insert into hotels values ('{str_name.Text}')";
-            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
-            sql_command.ExecuteNonQuery();
+            try
+            {
+                App.db.Hotels.Add(new Models.Hotel { Name = str_name.Text });
+                App.db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd dodawania hotelu: ten hotel prawdopodbnie istnieje");
+                Debug.WriteLine($"Err dodawanie hotelu: {ex.Message}");
+                return;
+            }
 
-            MessageBox.Show("Dodano hotel");
+            MessageBox.Show($"Dodano hotel {str_name.Text}");
         }
     }
 }

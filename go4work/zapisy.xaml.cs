@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -14,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using go4work.Models;
 
 namespace go4work
 {
@@ -22,14 +22,14 @@ namespace go4work
     /// </summary>
     public partial class zapisy : Page
     {
-        //! na razie się zastanowić wgl nad tym rozwiązaniem
-        // lista zapisanych ofert z poprzedniego ładowania
-        // jeśli ta lista jest pusta oznacza to że trzeba ją załadować z bazy danych
-        // można ręcznie odświeżyć listę klikając przycisk "odśwież"
-        // private static List<work_offer> CachedOffers = new List<work_offer>();
-        // może trzeba zrobić dodatkową zmienną WasChached żeby nie ładować ofert za każdym razem jeśli nie ma żadnych ofert??
-
+        /// <summary>
+        /// liczba ofert na strone
+        /// </summary>
         public const int OFFERS_PER_PAGE = 10;
+
+        /// <summary>
+        /// numer pierwszej strony
+        /// </summary>
         public const int FIRST_PAGE = 0;
 
         public zapisy()
@@ -91,16 +91,22 @@ namespace go4work
         /// </summary>
         private void Register(object? sender, EventArgs e)
         {
-            var button = sender as Button;
-
-            string command = $@"insert into taken_offers (offer_id, employee_id) values ({button.Tag}, '{App.logged_user_id}');
-                                update work_offers set taken = 1 where id = {button.Tag};";
-
-            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
-            sql_command.ExecuteNonQuery();
+            try
+            {
+                App.db.AcceptedOffers.Add(new AcceptedOffer() {
+                    UserPesel = App.logged_user_id,
+                    JobOfferID = Convert.ToInt32((sender as Button).Tag)
+                });
+                App.db.JobOffers.Find((sender as Button).Tag).WasAccepted = true;
+                App.db.SaveChanges();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("błąd zapisu na ofertę");
+                Debug.WriteLine("zapisy:Register(): " + ex.Message);
+            }
 
             MessageBox.Show("Zapisano na ofertę!");
-
             LoadOffers(OfferList.CurrentPage); // ładujemy ponownie aktualną stronę
         }
 
@@ -117,27 +123,44 @@ namespace go4work
             OfferList.Items.Clear();
             OfferList.PageCount = GetPages(); // aktualizujemy liczbę stron
 
-            //OfferList.PageCount = GetPages(); // aktualizujemy liczbę stron
-
-            string command = $@"select work_offers.id, hotels.name as 'hotel_name', date, hours, salary from work_offers left join hotels on work_offers.hotel_id=hotels.id
-                                where {FiltersToSql()} order by date limit {OFFERS_PER_PAGE} offset {page*OFFERS_PER_PAGE}"; // ta część odpowiada za stronicowanie wyników
-
-            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
-            SQLiteDataReader reader = sql_command.ExecuteReader();
-
-            while (reader.Read())
+            try
             {
-                // wiersz bazy danych wygląda tak tak: id, hotel_name, data, godziny, wynagrodzenie
-                OfferList.Items.Add(new work_offer()
-                {
-                    id = reader["id"].ToString() ?? work_offer.DEFAULT_ID,
-                    hotel_name = reader["hotel_name"].ToString() ?? work_offer.DEFAULT_HOTEL_NAME,
-                    date = reader["date"].ToString() ?? work_offer.DEFAULT_DATE,
-                    hours = reader["hours"].ToString() ?? work_offer.DEFAULT_HOURS,
-                    salary = reader["salary"].ToString() ?? work_offer.DEFAULT_SALARY
-                });
+                var query = from work_offer in App.db.JobOffers
+                            where work_offer.WasAccepted == false
+                            select work_offer;
+
+                query = ApplyFilters(query); // aplikujemy filtry
+
+                var results = query.Skip(page * OFFERS_PER_PAGE).Take(OFFERS_PER_PAGE).ToList();
+                OfferList.Items = new LimitedObservableCollection<Models.JobOffer>(results); // TODO: sprawdzić czy działa
             }
-            reader.Close();
+            catch(Exception e)
+            {
+                MessageBox.Show("błąd ładownania ofert");
+                Debug.WriteLine("zapisy:LoadOffers(): " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// dodaje odpowiednie filtry do zapytania linq
+        /// </summary>
+        /// <param name="query">zapytanie do przekonwertowania</param>
+        /// <returns>przefiltrowane zapytanie</returns>
+        private IQueryable<JobOffer> ApplyFilters(IQueryable<JobOffer> query)
+        {
+            var result = query;
+
+            if (HotelList.SelectedItem != null && (HotelList.SelectedItem as ComboBoxItem).Tag.ToString() != "*")
+            {
+                result = result.Where(offer => offer.HotelID == Convert.ToInt32((HotelList.SelectedItem as ComboBoxItem).Tag.ToString()));
+            }
+
+            if (DateFilter.SelectedDate != null)
+            {
+                result = result.Where(offer => offer.Date >= DateFilter.SelectedDate);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -147,45 +170,16 @@ namespace go4work
         {
             // teoretycznie można dorobić żeby przechowywało stare zazanczenie pomiędzy odświeżeniami
 
-            string command = $"select id, name from hotels;";
-            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
-            SQLiteDataReader reader = sql_command.ExecuteReader();
+            var query = from hotel in App.db.Hotels
+                        select hotel;
 
             HotelList.Items.Clear(); // najpierw trzeba wyczyścić wszystkie elementy z listy
             HotelList.Items.Add(new ComboBoxItem() { Tag = "*", Content = "Wszystkie hotele", IsSelected = true }); // dodajemy opcję "wszystkie" na początek
-
-            while (reader.Read())
+            foreach (var hotel in query)
             {
                 // dopiero potem dodajemy od nowa
-                HotelList.Items.Add(new ComboBoxItem() { Tag = reader.GetInt32(0), Content = reader.GetString(1) });
+                HotelList.Items.Add(new ComboBoxItem() { Tag = hotel.ID, Content = hotel.Name });
             }
-
-            reader.Close();
-        }
-
-        /// <summary>
-        /// generuje warunek dla wyszukiwań sql
-        /// zwrócony tekst jest postaci warunek1 and warunek2 and warunek3 itd.
-        /// </summary>
-        /// <example>
-        /// var command = $"select ... from ... where {FiltersToSql()}";
-        /// </example>
-        private string FiltersToSql()
-        {
-            string today = DateTime.Now.ToString("yyyy-MM-dd"); // dzisiejsza data w formacie akceptowanym przez bazę danych
-            string condition_string = $"date >= '{today}' and taken = 0"; // bazowe wymagania do których będziemy dodawać kolejne
-
-            if (HotelList.SelectedItem != null && (HotelList.SelectedItem as ComboBoxItem).Tag.ToString() != "*")
-            {
-                condition_string += $" and hotel_id={Convert.ToInt32((HotelList.SelectedItem as ComboBoxItem).Tag)}";
-            }
-
-            if (DateFilter.SelectedDate != null)
-            {
-                condition_string += $" and date='{DateFilter.SelectedDate.Value.ToString("yyyy-MM-dd")}'"; // w takim formacie daty przyjmuje baza danych
-            }
-
-            return condition_string;
         }
 
         /// <summary>
@@ -193,21 +187,14 @@ namespace go4work
         /// </summary>
         private int GetPages()
         {
-            string command = $"select count(*) from work_offers where {FiltersToSql()}";
-            SQLiteCommand sql_command = new SQLiteCommand(command, App.connection);
-            SQLiteDataReader reader = sql_command.ExecuteReader();
+            var query = from work_offer in App.db.JobOffers
+                        where work_offer.WasAccepted == false
+                        select work_offer;
 
-            if (!reader.Read())
-            {
-                Debug.WriteLine("Błąd ładowania liczby stron??");
-                return 1;
-                //TODO: coś z tym zrobić
-            }
+            query = ApplyFilters(query); // aplikujemy filtry
 
-            int calculated_pages = reader.GetInt32(0) / OFFERS_PER_PAGE; // pamiętajmy że to dzielenie bez reszty
-            if (reader.GetInt32(0) % OFFERS_PER_PAGE != 0) calculated_pages++; // jeśli jest reszta to trzeba dodać jeszcze jedną stronę
-
-            reader.Close();
+            int calculated_pages = query.Count() / OFFERS_PER_PAGE; // pamiętajmy że to dzielenie bez reszty
+            if (query.Count() % OFFERS_PER_PAGE != 0) calculated_pages++; // jeśli jest reszta to trzeba dodać jeszcze jedną stronę
 
             return calculated_pages;
         }

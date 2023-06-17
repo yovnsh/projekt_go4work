@@ -42,7 +42,7 @@
             <Grid>
                 <ItemsControl x:Name="OfferList" ItemsSource="{Binding Items}" d:ItemsSource="{d:SampleData ItemCount=20}">
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="local:work_offer">
+                        <DataTemplate DataType="local:Models.JobOffer">
                             <!-- wygląd pojedyńczego wiersza -->
                             <Grid Height="25">
                                 <Grid.ColumnDefinitions>
@@ -53,10 +53,10 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding hotel_name}"/>
-                                <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding date}"/>
-                                <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding hours}"/>
-                                <TextBlock Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding salary}"/>
+                                <TextBlock Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Hotel.Name}"/>
+                                <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Date}"/>
+                                <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Hours}"/>
+                                <TextBlock Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Salary}"/>
                                 <Button Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ButtonClick"
                                         Tag="{Binding id}" Content="{Binding ButtonText, RelativeSource={RelativeSource AncestorType=local:niewiem}}"/>
                             </Grid>

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,12 +28,30 @@ namespace go4work
 
         private void SignUp(object sender, RoutedEventArgs e)
         {
-            string command = $@"insert into users (pesel, name, surname, password, city, street, apartament_number, card_number, telephone_number)
-                                values ('{str_pesel.Text}', '{str_name.Text}', '{str_surname.Text}', '{str_password.Text}', '{str_city.Text}', '{str_street.Text}',
-                                        '{str_aparament_n.Text}', '{str_card_n.Text}', '{str_telephone_n.Text}');";
-            SQLiteCommand SQLiteCommand = new SQLiteCommand(command, App.connection);
-            //SQLiteDataReader reader = SQLiteCommand.ExecuteReader();
-            SQLiteCommand.ExecuteNonQuery();
+            //TODO: validacja
+
+            try
+            {
+                App.db.Users.Add(new Models.User
+                {
+                    Pesel = str_pesel.Text,
+                    Name = str_name.Text,
+                    Surname = str_surname.Text,
+                    Password = str_password.Text,
+                    City = str_city.Text,
+                    Street = str_street.Text,
+                    ApartamentNumber = str_aparament_n.Text,
+                    CardNumber = str_card_n.Text,
+                    TelephoneNumber = str_telephone_n.Text
+                });
+                App.db.SaveChanges();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Błąd dodawania użytkownika");
+                Debug.WriteLine($"SignUp: {ex.Message}");
+                return;
+            }
 
             MessageBox.Show("zarejestrowano!");
             this.NavigationService.Navigate(new Uri("logowanie.xaml", UriKind.Relative));
