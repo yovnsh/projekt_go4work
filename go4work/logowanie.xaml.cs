@@ -41,9 +41,16 @@ namespace go4work
                 var result = query.Single();
 
                 App.logged_user_id = result.Pesel;
-                MessageBox.Show("zalogowano");
 
-                this.NavigationService.Navigate(new Uri("zapisy.xaml", UriKind.Relative));
+                Window LoginWindow = Window.GetWindow(this);
+                Window MainWindow = new MainWindow();
+                MainWindow.Owner = LoginWindow;
+                MainWindow.Show();
+
+                App.Current.MainWindow = MainWindow;
+                MainWindow.Owner = null;
+                
+                LoginWindow.Close();
             }
             catch(InvalidOperationException)
             {
