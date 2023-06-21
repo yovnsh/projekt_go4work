@@ -8,17 +8,7 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="taken">
 
-    <Grid Background="#FFE8CEC7">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="76"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid>
-            <Button Content="Wróć" Click="GoBack" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="34,0,0,0"></Button>
-            <TextBlock FontFamily="Tw Cen MT" Text="Zapisane oferty" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="36" Margin="0,20,0,0"/>
-            <Button Content="dodaj oferty" HorizontalAlignment="Left" VerticalAlignment="Center" Click="CreateOffer" Margin="731,0,0,0"/>
-        </Grid>
-        <local:niewiem x:Name="RegisteredOffers" Grid.Row="1"/>
-        <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="354" Grid.Row="1" VerticalAlignment="Center" Width="748"/>
+    <Grid>
+        <local:niewiem x:Name="RegisteredOffers"/>
     </Grid>
 </Page>

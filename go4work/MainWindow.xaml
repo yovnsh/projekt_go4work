@@ -4,10 +4,56 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:go4work"
+        xmlns:converters="clr-namespace:go4work.Converters"
         mc:Ignorable="d" WindowStartupLocation="CenterOwner"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <converters:CapitalizeConverter x:Key="CapitalizeConverter"/>
+        <Style x:Key="LinkButton" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="FontFamily" Value="Lato Semibold"/>
+            <Setter Property="Foreground" Value="Gray"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderBrush="Transparent">
+                            <ContentPresenter  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="#ab8d86"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="false">
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-    <Grid>
-        <Frame x:Name="yanosik" NavigationUIVisibility="Hidden"></Frame>
+        <!-- nagłówek -->
+        <Grid Grid.Row="0" Background="#333333">
+            <TextBlock d:Text="Imię" Text="{Binding Source={x:Static local:App.logged_user}, Path=Name, Converter={StaticResource CapitalizeConverter}}" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="50,0,0,0" FontSize="24"/>
+            <TextBlock d:Text="Nazwisko" Text="{Binding Source={x:Static local:App.logged_user}, Path=Surname, Converter={StaticResource CapitalizeConverter}}" Foreground="White" VerticalAlignment="Center" Margin="125,0,0,0" FontSize="24" HorizontalAlignment="Left"/>
+        </Grid>
+        <!-- zakładki -->
+        <Grid Grid.Row="1" Margin="40 0">
+            <Button x:Name="Tab1" Style="{StaticResource LinkButton}" Click="ChangeTab" Tag="zapisy.xaml">Zapisy</Button>
+            <Button x:Name="Tab2" Style="{StaticResource LinkButton}" Click="ChangeTab" Margin="75,0,0,0" Tag="taken.xaml">Aktywne rezerwacje</Button>
+        </Grid>
+
+        <!-- lista ofert -->
+        <Frame Grid.Row="2" x:Name="yanosik" Source="zapisy.xaml" NavigationUIVisibility="Hidden" Margin="40, 0, 40, 0"/>
+        <Border Grid.RowSpan="2" BorderBrush="#e6d8d7" BorderThickness="2 0 2 0" HorizontalAlignment="Center" Height="350" Grid.Row="1" VerticalAlignment="Top" Width="748"/>
     </Grid>
 </Window>

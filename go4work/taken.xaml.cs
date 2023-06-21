@@ -1,4 +1,6 @@
-﻿using System;
+﻿using go4work.Contexts;
+using Microsoft.EntityFrameworkCore.Storage;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -24,7 +26,12 @@ namespace go4work
         /// <summary>
         /// liczba ofert wyświetlanych na stronie
         /// </summary>
-        public const int ITEMS_PER_PAGE = 10;
+        public const int ITEMS_PER_PAGE = 3;
+
+        /// <summary>
+        /// numer pierwszej strony
+        /// </summary>
+        public const int FIRST_PAGE = 0;
 
         public taken()
         {
@@ -36,7 +43,7 @@ namespace go4work
             RegisteredOffers.ButtonText = "Wypisz się";
             RegisteredOffers.ButtonAction += UnRegister;
 
-            LoadPage(0);
+            LoadPage(FIRST_PAGE);
         }
 
         /// <summary>
@@ -45,6 +52,7 @@ namespace go4work
         private void UnRegister(object? sender, EventArgs args)
         {
             // usuwa ofertę z listy zarejestrowanych i zmienia jej status na wolny
+            UpdateUser();
             try
             {
                 var choosen_offer = App.db.AcceptedOffers.Where(offer => offer.JobOfferID == Convert.ToUInt32((sender as Button).Tag.ToString())).Single();
@@ -76,6 +84,13 @@ namespace go4work
         /// </summary>
         private int GetPages()
         {
+            UpdateUser();
+
+            if(App.logged_user.AcceptedOffers == null)
+            {
+                return 0;
+            }
+
             int count = App.logged_user.AcceptedOffers.Count();
 
             int result = count / ITEMS_PER_PAGE; // liczba elementów / liczba elementów na stronę = strony
@@ -93,36 +108,42 @@ namespace go4work
         /// <param name="i">numer strony</param>
         private void LoadPage(int i)
         {
-            var query = App.logged_user.AcceptedOffers.Skip(i * ITEMS_PER_PAGE).Take(ITEMS_PER_PAGE).ToList();
-
             RegisteredOffers.Items.Clear();
-            foreach (var item in query)
+            RegisteredOffers.PageCount = GetPages();
+
+            // jeśli nie ma co ładować to nie ładujemy
+            if(App.logged_user.AcceptedOffers == null || RegisteredOffers.PageCount == 0)
             {
-                try
+                return;
+            }
+
+            try
+            {
+                var query = App.logged_user.AcceptedOffers.Skip(i * ITEMS_PER_PAGE).Take(ITEMS_PER_PAGE);
+
+
+                foreach (var item in query)
                 {
-                    RegisteredOffers.Items.Add(item.JobOffer);
+                    try
+                    {
+                        RegisteredOffers.Items.Add(item.JobOffer);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine($"Błąd wyświetlania oferty: {e.Message}");
+                    }
                 }
-                catch(Exception e)
-                {
-                    Debug.WriteLine($"Błąd wyświetlania oferty: {e.Message}");
-                }
+            }
+            catch(Exception err)
+            {
+                MessageBox.Show("błąd ładowania strony");
+                Debug.WriteLine($"LoadPage: {err.Message}");
             }
         }
 
-        /// <summary>
-        /// obsługuje przycisk powrotu do poprzedniej strony
-        /// </summary>
-        private void GoBack(object sender, RoutedEventArgs e)
+        private void UpdateUser()
         {
-            this.NavigationService.Navigate(new Uri("zapisy.xaml", UriKind.Relative));
-        }
-
-        /// <summary>
-        /// obsługuje przycisk przejścia do strony dodawania oferty
-        /// </summary>
-        private void CreateOffer(object sender, RoutedEventArgs e)
-        {
-            this.NavigationService.Navigate(new Uri("DodajOferty.xaml", UriKind.Relative));
+            App.db.Entry(App.logged_user).Collection("AcceptedOffers").Load();
         }
     }
 }

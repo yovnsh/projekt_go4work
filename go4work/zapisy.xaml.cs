@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using go4work.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace go4work
 {
@@ -42,7 +43,7 @@ namespace go4work
             OfferList.ButtonText = "Zapisz się"; // ustawiamy tekst na guziku
             OfferList.ButtonAction += Register;
 
-            LoadHotels(); // ładujemy hotele do filtru hoteli
+            //LoadHotels(); // ładujemy hotele do filtru hoteli
             LoadOffers(FIRST_PAGE); // tylko pierwszą strona
         }
 
@@ -63,27 +64,6 @@ namespace go4work
         private void SearchOffers(object sender, RoutedEventArgs e)
         {
             LoadOffers(FIRST_PAGE); // ładujemy od początku co powoduje zastosowanie filtrów
-        }
-
-        /// <summary>
-        /// obsługuje guzik "Wyczyść filtry" - czyści filtry i odświeża listę ofert
-        /// </summary>
-        private void ClearFilters(object sender, RoutedEventArgs e)
-        {
-            // ustawiamy tylko filtry na stan początkowy
-            HotelList.SelectedIndex = 0;
-            DateFilter.SelectedDate = null;
-
-            // załadowanie od nowa ofert korzysta z wartości z kontrolek więc samo powinno załadować bez filtrów
-            LoadOffers(FIRST_PAGE);
-        }
-
-        /// <summary>
-        /// obsługuje guzik "Zapisane Oferty" - przenosi do strony zapisanych ofert
-        /// </summary>
-        private void GoToTakenOffers(object sender, RoutedEventArgs e)
-        {
-            this.NavigationService.Navigate(new Uri("taken.xaml", UriKind.Relative));
         }
 
         /// <summary>
@@ -129,9 +109,10 @@ namespace go4work
                             where work_offer.WasAccepted == false
                             select work_offer;
 
-                query = ApplyFilters(query); // aplikujemy filtry
 
-                var results = query.Skip(page * OFFERS_PER_PAGE).Take(OFFERS_PER_PAGE).ToList();
+                //query = ApplyFilters(query); // aplikujemy filtry
+
+                var results = query.Skip(page * OFFERS_PER_PAGE).Take(OFFERS_PER_PAGE).Include("Hotel");
                 OfferList.Items.Clear();
                 foreach (var result in results)
                 {
@@ -146,47 +127,6 @@ namespace go4work
         }
 
         /// <summary>
-        /// dodaje odpowiednie filtry do zapytania linq
-        /// </summary>
-        /// <param name="query">zapytanie do przekonwertowania</param>
-        /// <returns>przefiltrowane zapytanie</returns>
-        private IQueryable<JobOffer> ApplyFilters(IQueryable<JobOffer> query)
-        {
-            var result = query;
-
-            if (HotelList.SelectedItem != null && (HotelList.SelectedItem as ComboBoxItem).Tag.ToString() != "*")
-            {
-                result = result.Where(offer => offer.HotelID == Convert.ToInt32((HotelList.SelectedItem as ComboBoxItem).Tag.ToString()));
-            }
-
-            if (DateFilter.SelectedDate != null)
-            {
-                result = result.Where(offer => offer.Date >= DateFilter.SelectedDate);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// ładuje hotele do filtra hoteli XD
-        /// </summary>
-        private void LoadHotels()
-        {
-            // teoretycznie można dorobić żeby przechowywało stare zazanczenie pomiędzy odświeżeniami
-
-            var query = from hotel in App.db.Hotels
-                        select hotel;
-
-            HotelList.Items.Clear(); // najpierw trzeba wyczyścić wszystkie elementy z listy
-            HotelList.Items.Add(new ComboBoxItem() { Tag = "*", Content = "Wszystkie hotele", IsSelected = true }); // dodajemy opcję "wszystkie" na początek
-            foreach (var hotel in query)
-            {
-                // dopiero potem dodajemy od nowa
-                HotelList.Items.Add(new ComboBoxItem() { Tag = hotel.ID, Content = hotel.Name });
-            }
-        }
-
-        /// <summary>
         /// sprawdza ile jest stron wyników w aktualnych filtrach
         /// </summary>
         private int GetPages()
@@ -195,7 +135,7 @@ namespace go4work
                         where work_offer.WasAccepted == false
                         select work_offer;
 
-            query = ApplyFilters(query); // aplikujemy filtry
+            //query = ApplyFilters(query); // aplikujemy filtry
 
             int calculated_pages = query.Count() / OFFERS_PER_PAGE; // pamiętajmy że to dzielenie bez reszty
             if (query.Count() % OFFERS_PER_PAGE != 0) calculated_pages++; // jeśli jest reszta to trzeba dodać jeszcze jedną stronę
