@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:go4work"
         mc:Ignorable="d"
-        Title="LoginWindow" Height="450" Width="500" ResizeMode="NoResize"
+        Title="LoginWindow" Height="500" Width="500" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
     <Grid>
         <Frame x:Name="yanosik2" Source="logowanie.xaml" NavigationUIVisibility="Hidden"/>
