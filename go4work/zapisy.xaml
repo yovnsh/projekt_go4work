@@ -4,18 +4,26 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:go4work"
+      xmlns:converters="clr-namespace:go4work.Converters"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="zapisy">
-
-    <Grid Background="#FFE8CEC7">
+    <Page.Resources>
+        <converters:CapitalizeConverter x:Key="CapitalizeConverter"/>
+    </Page.Resources>
+    <Grid Background="White">
         <Grid.RowDefinitions>
-            <RowDefinition Height="80"/>
+            <RowDefinition Height="100"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <Grid Grid.Row="0" Background="#FFA08282">
+            <TextBlock d:Text="Imię" Text="{Binding Source={x:Static local:App.logged_user}, Path=Name, Converter={StaticResource CapitalizeConverter}}" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="50,0,0,0" FontSize="24"/>
+            <TextBlock d:Text="Nazwisko" Text="{Binding Source={x:Static local:App.logged_user}, Path=Surname, Converter={StaticResource CapitalizeConverter}}" Foreground="White" VerticalAlignment="Center" Margin="125,0,0,0" FontSize="24" HorizontalAlignment="Left"/>
+        </Grid>
+
         <!-- nawigacja -->
-        <Grid>
+        <Grid Grid.Row="0" Visibility="Hidden">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -28,11 +36,11 @@
             <Button Content="Szukaj" HorizontalAlignment="Center" VerticalAlignment="Center" Click="SearchOffers" Grid.Column="2" RenderTransformOrigin="0.325,6.714"/>
             <Button Content="Wyczyść filtry" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ClearFilters" Grid.Column="3"/>
             <Button Content="Zapisane ofrty ->" HorizontalAlignment="Center" VerticalAlignment="Center" Click="GoToTakenOffers" Grid.Column="4"/>
-            
+
         </Grid>
 
         <!-- lista ofert -->
-        <local:niewiem x:Name="OfferList" Grid.Row="1"></local:niewiem>
-        <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="354" Grid.Row="1" VerticalAlignment="Center" Width="748"/>
+        <local:niewiem x:Name="OfferList" Grid.Row="1" Margin="40,40,40,0"></local:niewiem>
+        <Border BorderBrush="#e6d8d7" BorderThickness="2 0 2 0" HorizontalAlignment="Center" Height="350" Grid.Row="1" VerticalAlignment="Top" Width="748"/>
     </Grid>
 </Page>

@@ -92,7 +92,8 @@ namespace go4work
                 {
                     HotelID = Convert.ToInt32(choosen_hotel.Tag.ToString()),
                     Date = Data.SelectedDate.Value,
-                    Hours = Convert.ToInt32(str_hours.Text),
+                    ShiftStart = Data.SelectedDate.Value.Hour,
+                    ShiftEnd = Data.SelectedDate.Value.AddHours(Convert.ToInt32(str_hours.Text)).Hour,
                     Salary = Convert.ToInt32(str_salary.Text)
                 });
             }

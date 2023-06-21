@@ -45,11 +45,13 @@ namespace go4work
         private void UnRegister(object? sender, EventArgs args)
         {
             // usuwa ofertę z listy zarejestrowanych i zmienia jej status na wolny
-            // TODO: sprawdzić czy da się lepiej to zrobić
             try
             {
-                App.db.JobOffers.Remove(App.db.JobOffers.Find((sender as Button).Tag));
-                App.db.JobOffers.Find((sender as Button).Tag).WasAccepted = false;
+                var choosen_offer = App.db.AcceptedOffers.Where(offer => offer.JobOfferID == Convert.ToUInt32((sender as Button).Tag.ToString())).Single();
+
+                choosen_offer.JobOffer.WasAccepted = false;
+                App.db.AcceptedOffers.Remove(choosen_offer);
+
                 App.db.SaveChanges();
             }
             catch(Exception e)
@@ -74,12 +76,10 @@ namespace go4work
         /// </summary>
         private int GetPages()
         {
-            var query = from offer in App.db.AcceptedOffers
-                        where offer.UserPesel == App.logged_user_id
-                        select offer;
+            int count = App.logged_user.AcceptedOffers.Count();
 
-            int result = query.Count() / ITEMS_PER_PAGE; // liczba elementów / liczba elementów na stronę = strony
-            if (query.Count() % ITEMS_PER_PAGE != 0) // jeśli jest jakaś reszta z dzielenia to dodajemy jeszcze jedną stronę
+            int result = count / ITEMS_PER_PAGE; // liczba elementów / liczba elementów na stronę = strony
+            if (count % ITEMS_PER_PAGE != 0) // jeśli jest jakaś reszta z dzielenia to dodajemy jeszcze jedną stronę
             {
                 result++;
             }
@@ -93,14 +93,10 @@ namespace go4work
         /// <param name="i">numer strony</param>
         private void LoadPage(int i)
         {
-            // nie ma potrzeby sprawdzać ponownie liczby stron bo nie ma filtrów
-            var query = from offer in App.db.AcceptedOffers
-                        where offer.UserPesel == App.logged_user_id
-                        select offer;
+            var query = App.logged_user.AcceptedOffers.Skip(i * ITEMS_PER_PAGE).Take(ITEMS_PER_PAGE).ToList();
 
-            var result = query.Skip(i*ITEMS_PER_PAGE).Take(ITEMS_PER_PAGE).ToList();
-
-            foreach (var item in result)
+            RegisteredOffers.Items.Clear();
+            foreach (var item in query)
             {
                 try
                 {
@@ -127,16 +123,6 @@ namespace go4work
         private void CreateOffer(object sender, RoutedEventArgs e)
         {
             this.NavigationService.Navigate(new Uri("DodajOferty.xaml", UriKind.Relative));
-        }
-
-        private void RegisteredOffers_Loaded(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void RegisteredOffers_Loaded_1(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

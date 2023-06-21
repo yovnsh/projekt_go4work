@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,10 +37,18 @@ namespace go4work.Models
         public DateTime Date { get; set; }
 
         /// <summary>
-        /// liczba godzin pracy
+        /// godzina początku zmiany
         /// </summary>
         [Required]
-        public int Hours { get; set; }
+        [Range(0, 23)]
+        public int ShiftStart { get; set; }
+
+        /// <summary>
+        /// godzina końca zmiany
+        /// </summary>
+        [Required]
+        [Range(0, 23)]
+        public int ShiftEnd { get; set; }
 
         /// <summary>
         /// cena z godzinę pracy
@@ -57,5 +67,14 @@ namespace go4work.Models
         /// lista zrealizowanych ofert
         /// </summary>
         public virtual ICollection<AcceptedOffer> AcceptedOffers { get; set; }
+
+        [NotMapped]
+        public string Hours
+        {
+            get
+            {
+                return $"{ShiftStart}:00 - {ShiftEnd}:00";
+            }
+        }
     }
 }

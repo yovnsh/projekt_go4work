@@ -25,7 +25,7 @@ namespace go4work
         /// <summary>
         /// liczba ofert na strone
         /// </summary>
-        public const int OFFERS_PER_PAGE = 10;
+        public const int OFFERS_PER_PAGE = 3;
 
         /// <summary>
         /// numer pierwszej strony
@@ -94,7 +94,7 @@ namespace go4work
             try
             {
                 App.db.AcceptedOffers.Add(new AcceptedOffer() {
-                    UserPesel = App.logged_user_id,
+                    UserPesel = App.logged_user.Pesel,
                     JobOfferID = Convert.ToInt32((sender as Button).Tag)
                 });
                 App.db.JobOffers.Find((sender as Button).Tag).WasAccepted = true;
@@ -132,7 +132,11 @@ namespace go4work
                 query = ApplyFilters(query); // aplikujemy filtry
 
                 var results = query.Skip(page * OFFERS_PER_PAGE).Take(OFFERS_PER_PAGE).ToList();
-                OfferList.Items = new LimitedObservableCollection<Models.JobOffer>(results); // TODO: sprawdzić czy działa
+                OfferList.Items.Clear();
+                foreach (var result in results)
+                {
+                    OfferList.Items.Add(result);
+                }
             }
             catch(Exception e)
             {

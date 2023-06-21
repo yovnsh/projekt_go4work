@@ -4,8 +4,55 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:go4work"
+             xmlns:converters="clr-namespace:go4work.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="200" d:DesignWidth="800">
+             d:DesignHeight="300" d:DesignWidth="800">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="BackgroundColor" Color="#e6d8d7"/>
+        <FontFamily x:Key="TableFont">Georgia</FontFamily>
+        <FontFamily x:Key="HeaderFont">Candara Light</FontFamily>
+        <converters:ShortDateConverter x:Key="ShortDateConverter"/>
+        <converters:MoneyConverter x:Key="MoneyConverter"/>
+        <Style x:Key="VerticalSeparatorStyle" 
+       TargetType="{x:Type Separator}"
+       BasedOn="{StaticResource {x:Type Separator}}">
+            <Setter Property="Width" Value="15"/>
+            <Setter Property="Margin" Value="6,0,6,0"/>
+            <Setter Property="LayoutTransform">
+                <Setter.Value>
+                    <TransformGroup>
+                        <TransformGroup.Children>
+                            <TransformCollection>
+                                <RotateTransform Angle="90"/>
+                            </TransformCollection>
+                        </TransformGroup.Children>
+                    </TransformGroup>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="{StaticResource BackgroundColor}"/>
+            <Setter Property="FontFamily" Value="Lato Semibold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="Transparent">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#DEB8AE"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#DEB8AE"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <!-- podział na dwa rzędy - jeden nagłówek wysokość 50px i reszta dla listy ofert -->
         <Grid.RowDefinitions>
@@ -19,17 +66,23 @@
             <!-- 4 kolumny o długość 25% -->
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">Nazwa Hotelu</TextBlock>
-            <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">Data</TextBlock>
-            <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">Liczba godzin</TextBlock>
-            <TextBlock Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center">Wynagrodzenie</TextBlock>
+            <TextBlock Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="{StaticResource HeaderFont}">Data</TextBlock>
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="{StaticResource HeaderFont}">Hotel</TextBlock>
+                <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="{StaticResource HeaderFont}">Godziny</TextBlock>
+                <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="{StaticResource HeaderFont}">Wynagrodzenie</TextBlock>
+            </Grid>
 
+            <!-- ostatnia kolumna jest pusta -->
         </Grid>
 
 
@@ -44,21 +97,35 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="local:Models.JobOffer">
                             <!-- wygląd pojedyńczego wiersza -->
-                            <Grid Height="25">
+                            <Grid Height="40" Margin="0 5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="3*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Hotel.Name}"/>
-                                <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Date}"/>
-                                <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Hours}"/>
-                                <TextBlock Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Salary}"/>
-                                <Button Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center" Click="ButtonClick"
-                                        Tag="{Binding id}" Content="{Binding ButtonText, RelativeSource={RelativeSource AncestorType=local:niewiem}}"/>
+                                <Border Grid.Column="0" BorderBrush="Transparent" CornerRadius="4 4 4 4" Background="#e6d8d7">
+                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" d:Text="21.03.2007" Text="{Binding Date, Converter={StaticResource ShortDateConverter}}" FontFamily="{StaticResource TableFont}"/>
+                                </Border>
+                                <Border Grid.Column="1" BorderBrush="Transparent" CornerRadius="4 4 4 4" Background="#e6d8d7" Margin="15 0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Hotel.Name}" FontFamily="{StaticResource TableFont}"/>
+                                        <Separator Grid.Column="0" Style="{StaticResource VerticalSeparatorStyle}" HorizontalAlignment="Right"/>
+                                        <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Hours}" FontFamily="{StaticResource TableFont}"/>
+                                        <Separator Grid.Column="1" Style="{StaticResource VerticalSeparatorStyle}" HorizontalAlignment="Right"/>
+                                        <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Salary, Converter={StaticResource MoneyConverter}}" FontFamily="{StaticResource TableFont}"/>
+                                    </Grid>
+                                </Border>
+
+                                <Button Grid.Column="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" Click="ButtonClick"
+                                        Tag="{Binding ID}" d:Content="click here" Content="{Binding ButtonText, RelativeSource={RelativeSource AncestorType=local:niewiem}}"
+                                        Style="{StaticResource ButtonStyle}">
+                                </Button>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

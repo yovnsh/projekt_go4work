@@ -189,6 +189,9 @@ namespace go4work
                         HorizontalAlignment = HorizontalAlignment.Center,
                         VerticalAlignment = VerticalAlignment.Center,
                         Padding = new Thickness(5, 5, 5, 5),
+                        Width = 20,
+                        Height = 20,
+                        Style = (Style)FindResource("ButtonStyle"),
                         Content = (n + 1).ToString(), // numer strony
                         Tag = n.ToString(),         // też numer strony tylko od 0 numerowany
                     };
@@ -206,6 +209,9 @@ namespace go4work
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
                     Padding = new Thickness(5, 5, 5, 5),
+                    Width = 20,
+                    Height = 20,
+                    Style = (Style)FindResource("ButtonStyle"),
                     Content = "1",
                     Tag = "0"
                 };
@@ -216,6 +222,9 @@ namespace go4work
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
                     Padding = new Thickness(5, 5, 5, 5),
+                    Width = 20,
+                    Height = 20,
+                    Style = (Style)FindResource("ButtonStyle"),
                     Content = PageCount.ToString(),
                     Tag = (PageCount - 1).ToString()
                 };
@@ -233,6 +242,7 @@ namespace go4work
                     {
                         Text = "...",
                         HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center
                     });
                     // jeśli odległość jest większa niż 2 to robimy (1 ... n-1 n n+1 ... last) czyli zaczynamy od n-1 aż po n+1
                     start_index = CurrentPage - 1;
@@ -260,6 +270,9 @@ namespace go4work
                         HorizontalAlignment = HorizontalAlignment.Center,
                         VerticalAlignment = VerticalAlignment.Center,
                         Padding = new Thickness(5, 5, 5, 5),
+                        Width = 20,
+                        Height = 20,
+                        Style = (Style)FindResource("ButtonStyle"),
                         Content = (n + 1).ToString(), // numer strony
                         Tag = n.ToString(),           // też numer strony tylko od 0 numerowany
                     };
@@ -275,6 +288,7 @@ namespace go4work
                     {
                         Text = "...",
                         HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center
                     });
                 }
 

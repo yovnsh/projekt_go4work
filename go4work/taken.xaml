@@ -18,7 +18,7 @@
             <TextBlock FontFamily="Tw Cen MT" Text="Zapisane oferty" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="36" Margin="0,20,0,0"/>
             <Button Content="dodaj oferty" HorizontalAlignment="Left" VerticalAlignment="Center" Click="CreateOffer" Margin="731,0,0,0"/>
         </Grid>
-        <local:niewiem x:Name="RegisteredOffers" Grid.Row="1" Loaded="RegisteredOffers_Loaded_1"/>
+        <local:niewiem x:Name="RegisteredOffers" Grid.Row="1"/>
         <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="354" Grid.Row="1" VerticalAlignment="Center" Width="748"/>
     </Grid>
 </Page>

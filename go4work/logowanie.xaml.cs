@@ -34,13 +34,13 @@ namespace go4work
         {
             var query = from user in App.db.Users
                         where user.Pesel == str_pesel.Text && user.Password == str_haslo.Text
-                        select new { user.Pesel, user.Password };
+                        select user;
 
             try
             {
                 var result = query.Single();
 
-                App.logged_user_id = result.Pesel;
+                App.logged_user = result;
 
                 Window LoginWindow = Window.GetWindow(this);
                 Window MainWindow = new MainWindow();
