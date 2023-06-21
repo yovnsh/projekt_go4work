@@ -4,34 +4,64 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:go4work"
+      xmlns:validators="clr-namespace:go4work.Validators"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="450" d:DesignWidth="500"
       Title="rejestracja">
 
+    <Page.Resources>
+        <validators:PeselValidation x:Key="pesel_validator"/>
+        <validators:CardNumberValidator x:Key="card_validator"/>
+        <validators:PhoneNumberValidator x:Key="phone_validator"/>
+
+        <Style x:Key="CustomButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="#FFE8CEC7" />
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="2" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="{TemplateBinding Padding}"
+                        CornerRadius="0,4,0,4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#DEB8AE" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
     <Grid Background="#FFE8CEC7">
         <TextBlock FontFamily="Tw Cen MT" Text="Zarejestruj się" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="36" Margin="0,20,0,0"/>
-        <UniformGrid Columns="1" Width="175" Margin="313,81,312,85">
-            <TextBox Text="pesel" x:Name="str_pesel" VerticalAlignment="Top"/>
-            <TextBox Text="haslo" x:Name="str_password" VerticalAlignment="Top"/>
-            <TextBox Text="imie" x:Name="str_name" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
-            <TextBox Text="nazwisko" x:Name="str_surname" VerticalAlignment="Top"/>
+        <UniformGrid Columns="1" Width="175" Height="280">
+            <local:SuperiorTextBox x:Name="str_pesel" Placeholder="Pesel" Validator="{StaticResource pesel_validator}" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+            <local:SuperiorTextBox x:Name="str_password" Placeholder="Hasło" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+            <local:SuperiorTextBox x:Name="str_name" Placeholder="Imię" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+            <local:SuperiorTextBox x:Name="str_surname" Placeholder="Nazwisko" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0" Text="nr domu" x:Name="str_hous_n" HorizontalAlignment="Left" VerticalAlignment="Top" Width="77" />
-                <TextBox Grid.Column="1" Text="nr apartamentu" x:Name="str_aparament_n" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Margin="8,0,0,0"/>
+                <local:SuperiorTextBox Grid.Column="0" x:Name="str_house_n" Placeholder="Nr domu" HorizontalAlignment="Left" VerticalAlignment="Top" Width="77"/>
+                <local:SuperiorTextBox Grid.Column="1" x:Name="str_apartament_n" Placeholder="Nr apartamentu" HorizontalAlignment="Right" VerticalAlignment="Top" Width="77"/>
             </Grid>
-            <TextBox Text="miasto" x:Name="str_city" VerticalAlignment="Top" TextChanged="str_city_TextChanged"/>
-            <TextBox Text="ulica" x:Name="str_street" HorizontalAlignment="Stretch" VerticalAlignment="Top" />
-
-            <TextBox Text="numer karty" x:Name="str_card_n" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
-            <TextBox Text="numer telefonu" x:Name="str_telephone_n" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+            <local:SuperiorTextBox x:Name="str_city" Placeholder="Miasto" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+            <local:SuperiorTextBox x:Name="str_street" Placeholder="Ulica" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+            <local:SuperiorTextBox x:Name="str_card_n" Placeholder="Numer karty" Validator="{StaticResource card_validator}" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+            <local:SuperiorTextBox x:Name="str_telephone_n" Placeholder="Numer telefonu" Validator="{StaticResource phone_validator}" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
         </UniformGrid>
-        <Button Content="Zarejestruj" HorizontalAlignment="Center" VerticalAlignment="Top" Width="176" Click="SignUp" Margin="0,370,0,0" BorderBrush="#FFA7A7A7"/>
+        <Button Style="{StaticResource CustomButtonStyle}" Content="Zarejestruj" HorizontalAlignment="Center" VerticalAlignment="Top" Width="176" Click="SignUp" Margin="0,370,0,0"/>
         <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="391" Margin="0,20,0,0" VerticalAlignment="Top" Width="236"/>
         <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="370" Margin="0,59,0,0" VerticalAlignment="Top" Width="199"/>
-        
     </Grid>
 </Page>

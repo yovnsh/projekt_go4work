@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="go4work.SuperiorTextBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:go4work"
+             xmlns:validators="clr-namespace:go4work.Validators"
+             mc:Ignorable="d" 
+             d:DesignHeight="20" d:DesignWidth="175">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <Style TargetType="TextBox" x:Key="CommonInputStyle">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="2.5"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Background" Value="#FFE8CEC7"/>
+            <Setter Property="SelectionBrush" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border x:Name="input_border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="0,4,0,4">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                  BorderThickness="0" 
+                                  IsTabStop="False" 
+                                  Margin="0 -2.5"
+                                  Background="{x:Null}"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Validation.ErrorTemplate">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <!-- brak dodatkowych elementów dla błędów -->
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="SelectionBrush" Value="#000000"/>
+                </Trigger>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)/ErrorContent}"/>
+                    <Setter Property="BorderBrush" Value="Red"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center">
+
+        <TextBlock Margin="6 2" Text="{Binding Placeholder}" Foreground="Gray"
+                   Visibility="{Binding ElementName=input, Path=Text.IsEmpty, Converter={StaticResource BoolToVis}}" Panel.ZIndex="1"
+                   IsHitTestVisible="False"/>
+
+        <TextBox Style="{StaticResource CommonInputStyle}" Name="input" Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"/>
+    </Grid>
+</UserControl>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -21,14 +22,34 @@ namespace go4work
     /// </summary>
     public partial class rejestracja : Page
     {
+        private List<SuperiorTextBox> Inputs;
+
         public rejestracja()
         {
             InitializeComponent();
+
+            Inputs = new List<SuperiorTextBox>() { 
+                str_pesel,
+                str_name,
+                str_surname,
+                str_password,
+                str_city,
+                str_street,
+                str_apartament_n,
+                str_card_n,
+                str_telephone_n
+            };
+
+            this.DataContext = this;
         }
 
         private void SignUp(object sender, RoutedEventArgs e)
         {
-            //TODO: validacja
+            if(Inputs.Any(x => x.HasError || string.IsNullOrEmpty(x.Text)))
+            {
+                MessageBox.Show("Popraw dane w formularzu");
+                return;
+            }
 
             try
             {
@@ -40,7 +61,7 @@ namespace go4work
                     Password = str_password.Text,
                     City = str_city.Text,
                     Street = str_street.Text,
-                    ApartamentNumber = str_aparament_n.Text,
+                    ApartamentNumber = str_apartament_n.Text,
                     CardNumber = str_card_n.Text,
                     TelephoneNumber = str_telephone_n.Text
                 });
@@ -55,11 +76,6 @@ namespace go4work
 
             MessageBox.Show("zarejestrowano!");
             this.NavigationService.Navigate(new Uri("logowanie.xaml", UriKind.Relative));
-        }
-
-        private void str_city_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
         }
     }
 }
