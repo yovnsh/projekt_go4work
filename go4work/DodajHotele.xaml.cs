@@ -27,11 +27,6 @@ namespace go4work
             InitializeComponent();
         }
 
-        private void GoBack(object sender, RoutedEventArgs e)
-        {
-            this.NavigationService.GoBack();
-        }
-
         private void AddHotel(object sender, RoutedEventArgs e)
         {
             try

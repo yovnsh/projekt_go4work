@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -13,15 +14,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using go4work.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace go4work
 {
     /// <summary>
-    /// Logika interakcji dla klasy zapisy.xaml
+    /// Logika interakcji dla klasy lista_ofert_admin.xaml
     /// </summary>
-    public partial class zapisy : Page
+    public partial class lista_ofert_admin : Page
     {
         /// <summary>
         /// liczba ofert na strone
@@ -33,17 +32,13 @@ namespace go4work
         /// </summary>
         public const int FIRST_PAGE = 0;
 
-        public zapisy()
+        public lista_ofert_admin()
         {
             InitializeComponent();
 
             OfferList.ItemsPerPage = OFFERS_PER_PAGE;
             OfferList.OfferReloader += OffersChangePage; // ustawiamy aktualizator stron
 
-            OfferList.ButtonText = "Zapisz się"; // ustawiamy tekst na guziku
-            OfferList.ButtonAction += Register;
-
-            //LoadHotels(); // ładujemy hotele do filtru hoteli
             LoadOffers(FIRST_PAGE); // tylko pierwszą strona
         }
 
@@ -55,36 +50,6 @@ namespace go4work
 
             LoadOffers((e as niewiem.ReloadEventArgs).RequestedPage);
         }
-
-        #region Obsługa przycisków ------------
-
-        /// <summary>
-        /// obsługa guzików "Zapisz" - zapisuje użytkownika na ofertę pracy
-        /// </summary>
-        private void Register(object? sender, EventArgs e)
-        {
-            try
-            {
-                App.db.AcceptedOffers.Add(new AcceptedOffer() {
-                    UserPesel = App.logged_user.Pesel,
-                    JobOfferID = Convert.ToInt32((sender as Button).Tag)
-                });
-                App.db.JobOffers.Find((sender as Button).Tag).WasAccepted = true;
-                App.db.SaveChanges();
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show("błąd zapisu na ofertę");
-                Debug.WriteLine("zapisy:Register(): " + ex.Message);
-            }
-
-            MessageBox.Show("Zapisano na ofertę!");
-            LoadOffers(OfferList.CurrentPage); // ładujemy ponownie aktualną stronę
-        }
-
-        #endregion
-
-        #region Funkcje wewnętrzne ---------
 
         /// <summary>
         /// ładuje oferty i odświeża listę - korzysta z kontrolek filtrów
@@ -111,7 +76,7 @@ namespace go4work
                     OfferList.Items.Add(result);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 MessageBox.Show("błąd ładownania ofert");
                 Debug.WriteLine("zapisy:LoadOffers(): " + e.Message);
@@ -134,7 +99,5 @@ namespace go4work
 
             return calculated_pages;
         }
-
-        #endregion
     }
 }

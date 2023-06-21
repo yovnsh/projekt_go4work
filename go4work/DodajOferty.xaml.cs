@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,9 +22,18 @@ namespace go4work
     /// </summary>
     public partial class DodajOferty : Page
     {
+        private List<SuperiorTextBox> Inputs;
+
         public DodajOferty()
         {
             InitializeComponent();
+
+            Inputs = new List<SuperiorTextBox>()
+            {
+                str_shift_start,
+                str_shift_end,
+                str_salary
+            };
 
             LoadHotels(); // ładujemy wybory hoteli
         }
@@ -40,6 +50,10 @@ namespace go4work
 
             Hotels.Items.Clear(); // najpierw trzeba wyczyścić wszystkie elementy z listy
 
+            Hotels.Items.Add(new ComboBoxItem() { Tag = -1, Content = "Wybierz hotel" }); // dodajemy pierwszy element (nie można wybrać)
+            Hotels.SelectedIndex = 0; // ustawiamy na pierwszy element
+
+
             foreach(var hotel in query)
             {
                 Hotels.Items.Add(new ComboBoxItem() { Tag = hotel.ID, Content = hotel.Name });
@@ -52,7 +66,7 @@ namespace go4work
         /// </summary>
         private void AddOffer(object? sender, RoutedEventArgs args)
         {
-            if (Hotels.SelectedItem == null)
+            if (Hotels.SelectedItem == null || (Hotels.SelectedItem as ComboBoxItem).Tag.ToString() == "-1")
             {
                 MessageBox.Show("Wybierz hotel");
                 return;
@@ -64,15 +78,9 @@ namespace go4work
                 return;
             }
 
-            if (str_hours.Text == "")
+            if(Inputs.Any(x => x.HasError || string.IsNullOrEmpty(x.Text)))
             {
-                MessageBox.Show("Podaj ilość godzin");
-                return;
-            }
-
-            if(str_salary.Text == "")
-            {
-                MessageBox.Show("Podaj wynagrodzenie");
+                MessageBox.Show("Niepoprawne dane");
                 return;
             }
 
@@ -80,11 +88,8 @@ namespace go4work
             if (choosen_hotel == null)
             {
                 MessageBox.Show("Błąd dodawania oferty");
-                Debug.WriteLine("AddOffer: selecteditem nie jest comboboxitem???");
                 return;
             }
-
-            //TODO: walidacja danych
 
             try
             {
@@ -92,10 +97,11 @@ namespace go4work
                 {
                     HotelID = Convert.ToInt32(choosen_hotel.Tag.ToString()),
                     Date = Data.SelectedDate.Value,
-                    ShiftStart = Data.SelectedDate.Value.Hour,
-                    ShiftEnd = Data.SelectedDate.Value.AddHours(Convert.ToInt32(str_hours.Text)).Hour,
+                    ShiftStart = Convert.ToInt32(str_shift_start.Text),
+                    ShiftEnd = Convert.ToInt32(str_shift_end.Text),
                     Salary = Convert.ToInt32(str_salary.Text)
                 });
+                App.db.SaveChanges();
             }
             catch(Exception e)
             {
@@ -105,24 +111,6 @@ namespace go4work
             }
 
             MessageBox.Show("Dodano ofertę pracy");
-        }
-
-        /// <summary>
-        /// obsługuje guzik "wróć"
-        /// </summary>
-        private void GoBack(object sender, RoutedEventArgs e)
-        {
-            //TODO: poprawić nawigację tak żeby pokazywała do konkretnego miejsca
-            this.NavigationService.GoBack();
-        }
-
-        /// <summary>
-        /// obsługuje guzik "dodaj hotel"
-        /// przechodzi do strony dodawania hoteli
-        /// </summary>
-        private void AddHotel(object sender, RoutedEventArgs e)
-        {
-            this.NavigationService.Navigate(new Uri("DodajHotele.xaml", UriKind.Relative));
         }
     }
 }

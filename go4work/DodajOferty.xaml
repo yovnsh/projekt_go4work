@@ -4,24 +4,49 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:go4work"
+      xmlns:validators="clr-namespace:go4work.Validators"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="DodajOferty">
-
+    <Page.Resources>
+        <validators:HourValidator x:Key="HourValidaotor"/>
+        <validators:NumberValidator x:Key="NumberValidator"/>
+        <Style x:Key="CustomButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="2" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="{TemplateBinding Padding}"
+                        CornerRadius="0,4,0,4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#DEB8AE" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
     <Grid>
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="Black" Offset="1"/>
-                <GradientStop Color="#FFB58282"/>
-            </LinearGradientBrush>
-        </Grid.Background>
-        <Button Content="cofnij się" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="61,43,0,0" Click="GoBack"></Button>
-        <Button Content="Dodaj Hotele" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,43,59,0" Click="AddHotel"></Button>
-        <TextBlock Text="Dodaj oferte" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="36" Margin="0,29,0,0"/>
-        <ComboBox x:Name="Hotels" Margin="0,114,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Width="126"/>
-        <DatePicker x:Name="Data" Margin="0,166,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Height="34"/>
-        <TextBox x:Name="str_hours" Margin="0,230,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Width="176"></TextBox>
-        <TextBox x:Name="str_salary" Margin="0,283,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Width="199"/>
-        <Button Content="Dodaj oferte" Margin="0,360,0,0" Click="AddOffer" HorizontalAlignment="Center" VerticalAlignment="Top" Width="136"></Button>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <ComboBox Grid.Column="0" x:Name="Hotels" Margin="0,50,25,0" HorizontalAlignment="Right" VerticalAlignment="Top" Width="125"/>
+        <DatePicker Grid.Column="0" x:Name="Data" Margin="0,100,36,0" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+        <local:SuperiorTextBox Grid.Column="1" x:Name="str_shift_start" Margin="25,50,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Placeholder="Godzina początku zmiany" Validator="{StaticResource HourValidaotor}"/>
+        <local:SuperiorTextBox Grid.Column="1" x:Name="str_shift_end" Margin="25,100,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Placeholder="Godzina końca zmiany" Validator="{StaticResource HourValidaotor}"/>
+        <local:SuperiorTextBox x:Name="str_salary" Margin="25,150,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Placeholder="Wynagrodzenie" Grid.Column="1" Validator="{StaticResource NumberValidator}"/>
+        <Button Style="{StaticResource CustomButtonStyle}" Content="Dodaj ofertę" Margin="0,200,0,0" Click="AddOffer" HorizontalAlignment="Center" VerticalAlignment="Top" Width="136" Grid.ColumnSpan="2"/>
     </Grid>
 </Page>

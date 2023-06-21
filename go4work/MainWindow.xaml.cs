@@ -44,10 +44,23 @@ namespace go4work
             InitializeComponent();
             this.DataContext = this;
 
-            LoadAvatar();
 
-            Tabs = new List<Button>() { Tab1, Tab2, Tab3 }; // lista zakładek
+            if (App.logged_user.IsAdmin)
+            {
+                Navigation.Visibility = Visibility.Hidden;
+                AdminPanel.Visibility = Visibility.Visible;
+                CurrentTab = 3;
+            } else
+            {
+                CurrentTab = 0;
+
+            }
+
+            Tabs = new List<Button>() { Tab1, Tab2, Tab3, Tab4, Tab5, Tab6 }; // lista zakładek
             Tabs[CurrentTab].IsEnabled = false; // włączamy aktywną zakładkę
+            yanosik.Source = new Uri(Tabs[CurrentTab].Tag.ToString(), UriKind.Relative); // ustawiamy aktywną zakładkę
+
+            LoadAvatar();
         }
 
 
@@ -60,7 +73,7 @@ namespace go4work
             if (button == null) return;
 
             Tabs[CurrentTab].IsEnabled = true; // włączamy poprzednią zakładkę
-            CurrentTab = (button.Parent as Grid).Children.IndexOf(button); // ustawiamy nową zakładkę
+            CurrentTab = Convert.ToInt32(button.Name.Substring(3)) - 1; // ustawiamy nową zakładkę
             Tabs[CurrentTab].IsEnabled = false; // wyłączamy nową zakładkę
 
             yanosik.Source = new Uri(Tabs[CurrentTab].Tag.ToString(), UriKind.Relative); // ustawiamy nową zakładkę

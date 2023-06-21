@@ -32,6 +32,23 @@ namespace go4work
             // sprawdzenie czy cokolwiek jest w bazie danych
             try
             {
+                if(db.Users.Find("admin") == null)
+                {
+                    db.Users.Add(new User() { 
+                        Pesel = "admin",
+                        Password = "admin",
+                        IsAdmin = true,
+                        Name = "admin",
+                        Surname = "",
+                        City = "",
+                        Street = "",
+                        ApartamentNumber = "",
+                        CardNumber = "",
+                        TelephoneNumber = ""
+                    });
+                    db.SaveChanges();
+                }
+
                 // generowanie przykładowych hoteli
                 if (!db.Hotels.Any())
                 {

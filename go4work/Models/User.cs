@@ -72,6 +72,14 @@ namespace go4work.Models
         /// </summary>
         public string? AvatarPath { get; set; }
 
+
+        /// <summary>
+        /// czu użytkownik jest administratorem
+        /// </summary>
+        [Required]
+        [DefaultValue(false)]
+        public bool IsAdmin { get; set; }
+
         /// <summary>
         /// lista wszystkich przyjętych zleceń
         /// </summary>

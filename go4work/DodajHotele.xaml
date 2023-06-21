@@ -8,16 +8,35 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="DodajHotele">
 
+    <Page.Resources>
+        <Style x:Key="CustomButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="2" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="{TemplateBinding Padding}"
+                        CornerRadius="0,4,0,4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#DEB8AE" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
     <Grid>
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="Black" Offset="1"/>
-                <GradientStop Color="#FFB58282"/>
-            </LinearGradientBrush>
-        </Grid.Background>
-        <Button Content="cofnij się" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="61,43,0,0" Click="GoBack"></Button>
-        <TextBlock Text="Dodaj hotel" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="36" Margin="0,29,0,0"/>
-        <TextBox x:Name="str_name" Margin="294,191,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="199"/>
-        <Button Content="Dodaj hotel" Margin="326,310,0,0" Click="AddHotel" HorizontalAlignment="Left" VerticalAlignment="Top" Width="136"></Button>
+        <local:SuperiorTextBox x:Name="str_name" Width="150" VerticalAlignment="Top" Placeholder="Nazwa Hotelu" Margin="0 50 0 0"></local:SuperiorTextBox>
+        <Button HorizontalAlignment="Center" VerticalAlignment="Top"  Style="{StaticResource CustomButtonStyle}" Margin="0,100,0,0" Click="AddHotel">Dodaj</Button>
     </Grid>
 </Page>
