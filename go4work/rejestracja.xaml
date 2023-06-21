@@ -60,8 +60,9 @@
             <local:SuperiorTextBox x:Name="str_card_n" Placeholder="Numer karty" Validator="{StaticResource card_validator}" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
             <local:SuperiorTextBox x:Name="str_telephone_n" Placeholder="Numer telefonu" Validator="{StaticResource phone_validator}" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
         </UniformGrid>
-        <Button Style="{StaticResource CustomButtonStyle}" Content="Zarejestruj" HorizontalAlignment="Center" VerticalAlignment="Top" Width="176" Click="SignUp" Margin="0,370,0,0"/>
-        <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="349" Margin="0,63,0,0" VerticalAlignment="Top" Width="200"/>
+        <Button Style="{StaticResource CustomButtonStyle}" Content="Zarejestruj" HorizontalAlignment="Center" VerticalAlignment="Top" Width="68" Click="SignUp" Margin="0,386,0,0"/>
+        <Button Style="{StaticResource CustomButtonStyle}" Content="Wróć" HorizontalAlignment="Left" VerticalAlignment="Top" Width="50" Click="back" Margin="72,19,0,0"/>
+        <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="292" Margin="0,73,0,0" VerticalAlignment="Top" Width="200" RenderTransformOrigin="0.519,0.566"/>
         <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Center" Height="388" VerticalAlignment="Top" Width="260" Margin="0,41,0,0"/>
     </Grid>
 </Page>

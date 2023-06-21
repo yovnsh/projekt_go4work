@@ -63,7 +63,8 @@ namespace go4work
                     Street = str_street.Text,
                     ApartamentNumber = str_apartament_n.Text,
                     CardNumber = str_card_n.Text,
-                    TelephoneNumber = str_telephone_n.Text
+                    TelephoneNumber = str_telephone_n.Text,
+                    AvatarPath = null
                 });
                 App.db.SaveChanges();
             }
@@ -75,6 +76,11 @@ namespace go4work
             }
 
             MessageBox.Show("zarejestrowano!");
+            this.NavigationService.Navigate(new Uri("logowanie.xaml", UriKind.Relative));
+        }
+
+        private void back(object sender, RoutedEventArgs e)
+        {
             this.NavigationService.Navigate(new Uri("logowanie.xaml", UriKind.Relative));
         }
     }
