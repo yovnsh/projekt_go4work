@@ -16,6 +16,7 @@ namespace go4work.Contexts
         public DbSet<Models.Hotel> Hotels { get; set; }
         public DbSet<Models.JobOffer> JobOffers { get; set; }
         public DbSet<Models.AcceptedOffer> AcceptedOffers { get; set; }
+        public DbSet<Models.Session> Sessions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

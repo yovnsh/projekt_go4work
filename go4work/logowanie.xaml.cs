@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,8 +44,11 @@ namespace go4work
 
                 App.logged_user = result;
 
+                GenerateSession(); // tworzy sesję użytkownika
+
                 Window LoginWindow = Window.GetWindow(this);
                 Window MainWindow = new MainWindow();
+                MainWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 MainWindow.Owner = LoginWindow;
                 MainWindow.Show();
 
@@ -57,6 +62,12 @@ namespace go4work
                 MessageBox.Show("błędnie wpisany pesel lub hasło");
                 return;
             }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Wystąpił błąd podczas logowania");
+                Debug.WriteLine("Błąd logowania: " + ex.Message);
+                return;
+            }
         }
 
         /// <summary>
@@ -65,6 +76,29 @@ namespace go4work
         private void SignUp(object sender, RoutedEventArgs e)
         {
             this.NavigationService.Navigate(new Uri("rejestracja.xaml", UriKind.Relative));
+        }
+
+        /// <summary>
+        /// generowanie sesji i zapisanie jej do pliku
+        /// </summary>
+        private void GenerateSession()
+        {
+            string sessid = Guid.NewGuid().ToString(); // tworzy nowy identyfikator sesji
+            // dodajemy sesje do bazy
+            App.db.Sessions.Add(new Models.Session
+            {
+                ID = sessid,
+                UserPesel = App.logged_user.Pesel
+            });
+
+            // tworzymy plik z identyfikatorem sesji
+            using (var writer = File.CreateText(@".\session.dat"))
+            {
+                writer.WriteLine(sessid);
+            }
+
+            // zapisujemy zmiany
+            App.db.SaveChanges();
         }
     }
 }

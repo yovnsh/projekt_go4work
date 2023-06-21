@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using go4work.Models;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -30,45 +31,20 @@ namespace go4work
         public int CurrentTab { get; set; } = 0;
         public List<Button> Tabs { get; set; }
 
+        public const string DEFAULT_AVATAR = @"pack://application:,,,/go4work;component/Assets/default_user.png";
+
+        public static DependencyProperty AvatarProperty = DependencyProperty.Register("Avatar", typeof(Uri), typeof(MainWindow));
+        public Uri Avatar { 
+            get => (Uri)GetValue(AvatarProperty);
+            set => SetValue(AvatarProperty, value);
+        }
+
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = this;
 
-            bool changed_avatar = false; // czy udało się załadować avatar
-            try
-            {
-                if (App.logged_user.AvatarPath != null)
-                {
-                    if(File.Exists(App.logged_user.AvatarPath))
-                    {
-                        BitmapImage image = new BitmapImage();
-                        image.BeginInit();
-                        image.CacheOption = BitmapCacheOption.OnLoad;
-                        image.UriSource = new Uri(App.logged_user.AvatarPath, UriKind.Relative);
-                        image.EndInit();
-                        
-                        Avatar.Background = new ImageBrush(image);
-                        changed_avatar = true;
-                    } 
-                    else
-                    {
-                        Debug.WriteLine("nie odnaleziono pliku z avatarem - usuwanie wpisów w bazie");
-                        App.logged_user.AvatarPath = null;
-                        App.db.SaveChanges();
-                    }
-                }
-            }
-            catch(Exception err)
-            {
-                Debug.WriteLine($"MainWindow Avatar: " + err.Message);
-            }
-
-            // jeśli nie załadowano żadnego to ładujemy domyślny
-            if(!changed_avatar)
-            {
-                Avatar.Background = (ImageBrush)FindResource("default_user");
-            }
-            
+            LoadAvatar();
 
             Tabs = new List<Button>() { Tab1, Tab2 }; // lista zakładek
             Tabs[CurrentTab].IsEnabled = false; // włączamy aktywną zakładkę
@@ -88,6 +64,42 @@ namespace go4work
             Tabs[CurrentTab].IsEnabled = false; // wyłączamy nową zakładkę
 
             yanosik.Source = new Uri(Tabs[CurrentTab].Tag.ToString(), UriKind.Relative); // ustawiamy nową zakładkę
+        }
+
+        /// <summary>
+        /// guzik wyloguj - usuwa sesję i wraca do logowania
+        /// </summary>
+        private void LogOut(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if(File.Exists(@".\session.dat"))
+                {
+                    string text = File.ReadAllLines(@".\session.dat")[0];
+                    Session? session = App.db.Sessions.Find(text);
+                    if(session != null)
+                    {
+                        Debug.WriteLine("poprawnie usunięta sesja");
+                        App.db.Remove(session);
+                        App.db.SaveChanges();
+                    }
+                    File.Delete(@".\session.dat");
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show($"Błąd wylogowywania");
+                Debug.WriteLine("Błąd wylogowywania " + ex.Message);
+                return;
+            }
+
+            // zamykanie starego okna i otwieranie nowego
+            LoginWindow loginWindow = new LoginWindow();
+            Window curr = App.Current.MainWindow;
+            App.Current.MainWindow = loginWindow;
+            curr.Close();
+            loginWindow.Show();
+
         }
 
         /// <summary>
@@ -116,12 +128,7 @@ namespace go4work
                     App.logged_user.AvatarPath = myUniqueFileName; // ustawiamy nowe zdjęcie
 
                     // zakładamy nowy obrazek
-                    BitmapImage image = new BitmapImage();
-                    image.BeginInit();
-                    image.CacheOption = BitmapCacheOption.OnLoad;
-                    image.UriSource = new Uri(myUniqueFileName, UriKind.Relative);
-                    image.EndInit();
-                    Avatar.Background = new ImageBrush(image);
+                    Avatar = new Uri(myUniqueFileName, UriKind.Relative);
 
                     // usuwamy stare zdjęcie
                     if(old_file != null && File.Exists(old_file))
@@ -137,6 +144,38 @@ namespace go4work
                     MessageBox.Show("Błąd ustawiania avatara");
                     Debug.WriteLine($"Avatar_Click: " + err.Message);
                 }
+            }
+        }
+
+        private void LoadAvatar()
+        {
+            bool changed_avatar = false; // czy udało się załadować avatar
+            try
+            {
+                if (App.logged_user.AvatarPath != null)
+                {
+                    if (File.Exists(App.logged_user.AvatarPath))
+                    {
+                        Avatar = new Uri(App.logged_user.AvatarPath, UriKind.Relative);
+                        changed_avatar = true;
+                    }
+                    else
+                    {
+                        Debug.WriteLine("nie odnaleziono pliku z avatarem - usuwanie wpisów w bazie");
+                        App.logged_user.AvatarPath = null;
+                        App.db.SaveChanges();
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                Debug.WriteLine($"MainWindow Avatar: " + err.Message);
+            }
+
+            // jeśli nie załadowano żadnego to ładujemy domyślny
+            if (!changed_avatar)
+            {
+                Avatar = new Uri(DEFAULT_AVATAR);
             }
         }
     }

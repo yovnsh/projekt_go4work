@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows;
 using go4work.Contexts;
 using go4work.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace go4work
 {
@@ -51,6 +53,63 @@ namespace go4work
                 MessageBox.Show($"Nie można się połączyć z bazą danych");
                 this.Shutdown();
             }
+
+            // sprawdzanie sesji
+            bool session_found = false;
+            try
+            {
+                if (File.Exists(@".\session.dat"))
+                {
+                    string text = File.ReadAllLines(@".\session.dat")[0];
+                    Session? session = db.Sessions.Find(text);
+                    if (session != null)
+                    {
+                        db.Entry(session).Reference(s => s.User).Load();
+                        
+                        if(session.User != null)
+                        {
+                            session_found = true;
+                            logged_user = session.User;
+                            Debug.WriteLine($"Session found");
+                        } else
+                        {
+                            Debug.WriteLine($"Session found but unusable");
+                            File.Delete(@".\session.dat");
+                            db.Sessions.Remove(session);
+                        }
+                    } 
+                    else
+                    {
+                        Debug.WriteLine("Session not found despite the file");
+                        File.Delete(@".\session.dat");
+                    }
+                }
+            }
+            catch(Exception err)
+            {
+                Debug.WriteLine("Session error: " + err.Message);
+            }
+
+            
+            if(session_found)
+            {
+                // jeśli jest sesja to można od razu przejść do głównego okna
+                var watch = Stopwatch.StartNew();
+                MainWindow = new MainWindow();
+                Debug.WriteLine($"MainWindow created in {watch.ElapsedMilliseconds}ms");
+                MainWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                MainWindow.Show();
+                watch.Stop();
+                Debug.WriteLine($"MainWindow loaded in {watch.ElapsedMilliseconds}ms");
+            }
+            else
+            {
+                // jeśli nie ma sesji to trzeba się zalogować
+                MainWindow = new LoginWindow();
+                MainWindow.Show();
+            }
+            /*MainWindow = new LoginWindow();
+            MainWindow.Show();*/
         }
 
         protected override void OnExit(ExitEventArgs e)

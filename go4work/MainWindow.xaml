@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:go4work"
         xmlns:converters="clr-namespace:go4work.Converters"
-        mc:Ignorable="d" WindowStartupLocation="CenterOwner"
+        mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
         <converters:CapitalizeConverter x:Key="CapitalizeConverter"/>
+        <converters:ImageConverter x:Key="ImageConverter"/>
         <Style x:Key="LinkButton" TargetType="{x:Type Button}">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -33,7 +34,7 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <ImageBrush x:Key="default_user" ImageSource="/Assets/default_user.png"/>
+        <!--<ImageBrush x:Key="default_user" ImageSource="/Assets/default_user.png"/>-->
         <SolidColorBrush x:Key="user_overlay" Color="Black" Opacity="0.9"/>
     </Window.Resources>
     <Grid Background="White">
@@ -46,7 +47,7 @@
         <!-- nagłówek -->
         <Grid Grid.Row="0" Background="#333333">
             <!-- avatar -->
-            <Button x:Name="Avatar" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="50,0,0,0" Background="{StaticResource default_user}" ToolTip="Zmień avatar" Click="Avatar_Click">
+            <Button x:Name="AvatarElement" d:Background="Gray" Background="{Binding Avatar, Converter={StaticResource ImageConverter}, IsAsync=True, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="50,0,0,0" ToolTip="Zmień avatar" Click="Avatar_Click">
                 <Button.Style>
                     <Style TargetType="Button">
                         <Setter Property="Cursor" Value="Hand"/>
@@ -74,6 +75,7 @@
             <Button x:Name="Tab1" Style="{StaticResource LinkButton}" Click="ChangeTab" Tag="zapisy.xaml">Zapisy</Button>
             <Button x:Name="Tab2" Style="{StaticResource LinkButton}" Click="ChangeTab" Margin="75,0,0,0" Tag="taken.xaml">Aktywne rezerwacje</Button>
         </Grid>
+        <Button Grid.Row="1" x:Name="Logout" Style="{StaticResource LinkButton}" Click="LogOut" HorizontalAlignment="Right" Margin="0,0,50,0">Wyloguj</Button>
 
         <!-- lista ofert -->
         <Frame Grid.Row="2" x:Name="yanosik" Source="zapisy.xaml" NavigationUIVisibility="Hidden" Margin="40, 0, 40, 0"/>
