@@ -74,6 +74,7 @@
         <Grid Grid.Row="1" Margin="40 0">
             <Button x:Name="Tab1" Style="{StaticResource LinkButton}" Click="ChangeTab" Tag="zapisy.xaml">Zapisy</Button>
             <Button x:Name="Tab2" Style="{StaticResource LinkButton}" Click="ChangeTab" Margin="75,0,0,0" Tag="taken.xaml">Aktywne rezerwacje</Button>
+            <Button x:Name="Tab3" Style="{StaticResource LinkButton}" Click="ChangeTab" Margin="225,0,0,0" Tag="archived.xaml">Zrealizowane zmiany</Button>
         </Grid>
         <Button Grid.Row="1" x:Name="Logout" Style="{StaticResource LinkButton}" Click="LogOut" HorizontalAlignment="Right" Margin="0,0,50,0">Wyloguj</Button>
 

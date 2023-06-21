@@ -46,7 +46,7 @@ namespace go4work
 
             LoadAvatar();
 
-            Tabs = new List<Button>() { Tab1, Tab2 }; // lista zakładek
+            Tabs = new List<Button>() { Tab1, Tab2, Tab3 }; // lista zakładek
             Tabs[CurrentTab].IsEnabled = false; // włączamy aktywną zakładkę
         }
 

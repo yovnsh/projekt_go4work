@@ -67,7 +67,18 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition>
+                    <ColumnDefinition.Style>
+                        <Style TargetType="ColumnDefinition">
+                            <Setter Property="Width" Value="*"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HideButtons}" Value="True">
+                                    <Setter Property="Width" Value="0"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ColumnDefinition.Style>
+                </ColumnDefinition>
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="{StaticResource HeaderFont}">Data</TextBlock>
@@ -101,7 +112,18 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="3*"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition>
+                                        <ColumnDefinition.Style>
+                                            <Style>
+                                                <Setter Property="ColumnDefinition.Width" Value="*"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HideButtons, RelativeSource={RelativeSource AncestorType=local:niewiem}}" Value="True">
+                                                        <Setter Property="ColumnDefinition.Width" Value="0"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ColumnDefinition.Style>
+                                    </ColumnDefinition>
                                 </Grid.ColumnDefinitions>
 
                                 <Border Grid.Column="0" BorderBrush="Transparent" CornerRadius="4 4 4 4" Background="#e6d8d7">
@@ -122,7 +144,7 @@
                                     </Grid>
                                 </Border>
 
-                                <Button Grid.Column="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" Click="ButtonClick"
+                                <Button Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" Click="ButtonClick"
                                         Tag="{Binding ID}" d:Content="click here" Content="{Binding ButtonText, RelativeSource={RelativeSource AncestorType=local:niewiem}}"
                                         Style="{StaticResource ButtonStyle}">
                                 </Button>

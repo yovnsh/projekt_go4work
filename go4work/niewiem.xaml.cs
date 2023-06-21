@@ -144,6 +144,11 @@ namespace go4work
         }
 
         /// <summary>
+        /// czy chcemy żeby kolumna z przyciskami nie była widoczna
+        /// </summary>
+        public bool HideButtons { get; set; } = false;
+
+        /// <summary>
         /// tekst przekazywany do przycisków
         /// </summary>
         public string ButtonText { get; set; } = "";

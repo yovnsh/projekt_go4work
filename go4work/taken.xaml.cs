@@ -1,4 +1,5 @@
 ﻿using go4work.Contexts;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
@@ -52,7 +53,6 @@ namespace go4work
         private void UnRegister(object? sender, EventArgs args)
         {
             // usuwa ofertę z listy zarejestrowanych i zmienia jej status na wolny
-            UpdateUser();
             try
             {
                 var choosen_offer = App.db.AcceptedOffers.Where(offer => offer.JobOfferID == Convert.ToUInt32((sender as Button).Tag.ToString())).Single();
@@ -84,14 +84,7 @@ namespace go4work
         /// </summary>
         private int GetPages()
         {
-            UpdateUser();
-
-            if(App.logged_user.AcceptedOffers == null)
-            {
-                return 0;
-            }
-
-            int count = App.logged_user.AcceptedOffers.Count();
+            int count = App.db.AcceptedOffers.Include(x => x.JobOffer).Where(x => x.JobOffer.Date >= DateTime.Today && x.UserPesel == App.logged_user.Pesel).Count();
 
             int result = count / ITEMS_PER_PAGE; // liczba elementów / liczba elementów na stronę = strony
             if (count % ITEMS_PER_PAGE != 0) // jeśli jest jakaś reszta z dzielenia to dodajemy jeszcze jedną stronę
@@ -112,15 +105,14 @@ namespace go4work
             RegisteredOffers.PageCount = GetPages();
 
             // jeśli nie ma co ładować to nie ładujemy
-            if(App.logged_user.AcceptedOffers == null || RegisteredOffers.PageCount == 0)
+            if(RegisteredOffers.PageCount == 0)
             {
                 return;
             }
 
             try
             {
-                var query = App.logged_user.AcceptedOffers.Skip(i * ITEMS_PER_PAGE).Take(ITEMS_PER_PAGE);
-
+                var query = App.db.AcceptedOffers.Include(x => x.JobOffer).Where(x => x.JobOffer.Date >= DateTime.Now && x.UserPesel == App.logged_user.Pesel).Skip(i * ITEMS_PER_PAGE).Take(ITEMS_PER_PAGE);
 
                 foreach (var item in query)
                 {
@@ -139,11 +131,6 @@ namespace go4work
                 MessageBox.Show("błąd ładowania strony");
                 Debug.WriteLine($"LoadPage: {err.Message}");
             }
-        }
-
-        private void UpdateUser()
-        {
-            App.db.Entry(App.logged_user).Collection("AcceptedOffers").Load();
         }
     }
 }
